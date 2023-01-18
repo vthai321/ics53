@@ -2,6 +2,12 @@
 # ifndef HW1_HELPERS
 # define HW1_HELPERS
 
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <ctype.h>
+#include "hw1.h"
+
 /**
 If -l or -h is supplied, uses a for-loop to parse through and process any optional arguments present
 

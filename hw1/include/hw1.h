@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "helpers1.h"
+#include <stdio.h>
+#include <string.h>
+
+// might not need these statements
 
 #ifndef hw1
 #define hw1

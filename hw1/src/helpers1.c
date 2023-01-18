@@ -1,9 +1,5 @@
 // Declare all helper functions for hw1 in this file
 #include "helpers1.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
 
 int lhParser(int flag, int argc, char** arg_str, int* argI, int* argS, int* argC, int* fg, int* bg, char** word)
 {
@@ -44,20 +40,24 @@ int lhParser(int flag, int argc, char** arg_str, int* argI, int* argS, int* argC
         {
             *argC = 1;
             // assume we can retrieve FG and BG
-            if(*arg_str[i+1] >= 30 && *arg_str[i+1] <= 37)
+            int fgColor = atoi(arg_str[i+1]);
+            int bgColor = atoi(arg_str[i+2]);
+           
+            if(fgColor >= 30 && fgColor <= 37)
             {
                 // valid fg
-                *fg = atoi(arg_str[i+1]);
+                *fg = fgColor;
             }
             else
             {
+                fprintf(stderr, USAGE);
                 return 1; // invalid fg argument :(
             }
 
-            if(*arg_str[i+2] >= 40 && *arg_str[i+2] <= 47)
+            if(bgColor >= 40 && bgColor <= 47)
             {
                 //valid bg
-                *bg = atoi(arg_str[i+2]);
+                *bg = bgColor;
             }
             else
             {
@@ -77,8 +77,9 @@ int lhParser(int flag, int argc, char** arg_str, int* argI, int* argS, int* argC
 /**
 Implements the -l command that counts words and has varying actions depending on flag.
 
-Make prominent use of the "<" operator to read from a file into STDIN. Use STDIN and process
-the information there using various methods
+Only full words count (not substrings); thus, either use tokens or finding words via spaces
+Use fscanf?
+
 
 */
 int lCommand(int argI, int argS)
@@ -99,7 +100,8 @@ Check if a sequence of chars is all digits or perhaps if the token does not cont
 int nCommand()
 {
     int numberFlag = 0; // 1 if we encounter a number, 0 if we encounter any other, etc.
-    char num[1024]; // constructs the number to print. review buffer with TA!
+    char num[1024] = ""; // constructs the number to print. review buffer with TA!
+    int exitStatus = 2; // 0 for success, 2 for no occurance of numbers
 
     while(1)
     {
@@ -112,6 +114,7 @@ int nCommand()
 
         if(isdigit(currentChar))
         {
+            exitStatus = 0; // not efficient but oh well
             numberFlag = 1;
             char currentCharCasted = (char)currentChar;
             strncat(num, &currentCharCasted, 1); 
@@ -123,7 +126,5 @@ int nCommand()
              num[0] = '\0'; // clear the string
         }
     }
-
-
-    return 0;
+    return exitStatus;
 }

@@ -52,11 +52,12 @@ int _53wgrep(int argc, char** arg_str)
     // plan is to implement each method of counting separately in its own function. 
     // Use if statements to decide which one to call
 
+    int exitStatus = 0;
     if(argReq == 0)
     {
         // -n, call the -n function
-        int nResult = nCommand();
-        return nResult;
+        exitStatus = nCommand();
+        return exitStatus;
 
         // read by token
     
@@ -82,7 +83,7 @@ int _53wgrep(int argc, char** arg_str)
 
     // the functions will return the appropriate exit status here.
 
-    return 0;
+    return exitStatus;
 }
 
 // Main program
@@ -90,5 +91,5 @@ int main(int argc, char *argv[])
 {
     // Insert your hw1 code here
     int exitCode = _53wgrep(argc, argv);  
-    return 0;
+    return exitCode;
 }
