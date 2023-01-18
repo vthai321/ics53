@@ -55,6 +55,10 @@ int _53wgrep(int argc, char** arg_str)
     if(argReq == 0)
     {
         // -n, call the -n function
+        int nResult = nCommand();
+        return nResult;
+
+        // read by token
     
 
     }
@@ -64,19 +68,21 @@ int _53wgrep(int argc, char** arg_str)
 
         //write a -l function that takes in relevant flags to determine course of action
 
+        // read by token
+
     }
     else if(argReq = 2)
     {
         // -h
 
         //write a -h function taking in relevant flags and values
+
+        // read by token
     }
 
     // the functions will return the appropriate exit status here.
 
     return 0;
-
-
 }
 
 // Main program
@@ -84,8 +90,5 @@ int main(int argc, char *argv[])
 {
     // Insert your hw1 code here
     int exitCode = _53wgrep(argc, argv);  
-
-    int a = 5;  
-
     return 0;
 }

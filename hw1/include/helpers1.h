@@ -21,5 +21,15 @@ fg and bg are used depending on value of argC
 */
 int hCommand(int argI, int argS, int argC, int fg, int bg);
 
+/**
+Implements the -n command that counts the amount of numbers in a given text
+A number is defined as a token consisting completely of digits
+
+Read char by char (or token by token?); read line as str using char *fgets(char *str, int n, FILE *stream)
+Check if a sequence of chars is all digits or perhaps if the token does not contain special chars or letters 
+
+*/
+int nCommand();
+
 
 # endif
