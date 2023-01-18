@@ -16,11 +16,13 @@ int lhParser(int flag, int argc, char** arg_str, int* argI, int* argS, int* argC
     }
     else
     {
+        fprintf(stderr, USAGE);
         return 1; // not -l or -h
     }
 
     if(argc > maxArgs)
     {
+        fprintf(stderr, USAGE);
         return 1; // too many arguments
     }
     *word = arg_str[2];
@@ -61,6 +63,7 @@ int lhParser(int flag, int argc, char** arg_str, int* argI, int* argS, int* argC
             }
             else
             {
+                fprintf(stderr, USAGE);
                 return 1; // invalid bg argument
             }
             i = argc; // end the loop 
@@ -68,6 +71,7 @@ int lhParser(int flag, int argc, char** arg_str, int* argI, int* argS, int* argC
         }
         else
         {
+            fprintf(stderr, USAGE);
             return 1; // invalid optional argument (duplicates, invalid values)
         }
     }
