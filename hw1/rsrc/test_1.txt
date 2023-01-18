@@ -1,0 +1,5 @@
+This line has no numbers.
+Numbers can appear at the start of a word eg. 1st or at the end of a word myVar2 or at the start or end of the line
+7 is a lucky number (to some it's 777) but also these numbers 8,9,11, 12, 13, 17, 18, 19,23, 27 
+1011_2 is 11 in binary and B in hexadecimal
+This number is at the very end of the file 1234567890
