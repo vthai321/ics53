@@ -16,13 +16,11 @@ int lhParser(int flag, int argc, char** arg_str, int* argI, int* argS, int* argC
     }
     else
     {
-        fprintf(stderr, USAGE);
         return 1; // not -l or -h
     }
 
     if(argc > maxArgs)
     {
-        fprintf(stderr, USAGE);
         return 1; // too many arguments
     }
     *word = arg_str[2];
@@ -52,7 +50,6 @@ int lhParser(int flag, int argc, char** arg_str, int* argI, int* argS, int* argC
             }
             else
             {
-                fprintf(stderr, USAGE);
                 return 1; // invalid fg argument :(
             }
 
@@ -63,7 +60,7 @@ int lhParser(int flag, int argc, char** arg_str, int* argI, int* argS, int* argC
             }
             else
             {
-                fprintf(stderr, USAGE);
+                
                 return 1; // invalid bg argument
             }
             i = argc; // end the loop 
@@ -71,25 +68,104 @@ int lhParser(int flag, int argc, char** arg_str, int* argI, int* argS, int* argC
         }
         else
         {
-            fprintf(stderr, USAGE);
             return 1; // invalid optional argument (duplicates, invalid values)
         }
     }
     return 0; // success
 }
 
-/**
-Implements the -l command that counts words and has varying actions depending on flag.
-
-Only full words count (not substrings); thus, either use tokens or finding words via spaces
-Use fscanf?
 
 
-*/
-int lCommand(int argI, int argS)
+int lCommand(int argI, int argS, char* word)
 {
+    int lineNumber = 1;
+    int wordPos = 1;
+    int interestWordPos = 1;
+    int matchOcc = 0;
+    int exitStatus = 2;
+    char wordConstruct[1024] = "";
 
-    return 0;
+    //flags
+    int notWhitespace = 0;
+    int charFlag = 0;
+
+    // for -S
+    int numChars = 0;
+
+    if(argI)
+    {
+        //make the word lowercase
+        size_t wordLen = sizeof(word);
+        for(size_t i = 0; i < wordLen; ++i)
+        {
+            word[i] = tolower(word[i]);
+        }
+    }
+
+
+    // reuse algorithms from -n
+    while(1)
+    {
+        if(feof(stdin))
+        {
+            //add some mechanism to check if the last char belongs to a word we look for
+            if(notWhitespace)
+            {
+                // now compare the word
+                compareWord(wordConstruct, word, argI, &matchOcc, interestWordPos, lineNumber);
+            }
+            break; // end of file reached
+        }
+       
+        int currentChar = getchar(); //ascii value
+
+        if(currentChar == '\n')
+        {
+            ++lineNumber;
+            wordPos = 1;
+        }
+        else if(isspace(currentChar) == 0) // begin or middle of word
+        {
+            if(notWhitespace == 0)
+            {
+                //mark begining of word by setting interestWordPos value
+                interestWordPos = wordPos;
+            }
+            
+            notWhitespace = 1;
+            char currentCharCasted = (char)currentChar;
+            strncat(wordConstruct, &currentCharCasted, 1); 
+        }
+        else if(isspace(currentChar) == 1 && notWhitespace) //encountered whitespace at end of a word
+        {
+            notWhitespace = 0;
+
+            // now compare the word
+            compareWord(wordConstruct, word, argI, &matchOcc, interestWordPos, lineNumber); 
+            interestWordPos = wordPos;
+        }
+        ++numChars;
+        ++wordPos; // a counter for the pos in the line. 
+    }
+
+    if(matchOcc > 0)
+    {
+        exitStatus = 0;
+    }
+
+    if(argS)
+    {
+        if(matchOcc > 0)
+        {
+            fprintf(stdout, "%d %d %d", matchOcc, numChars, lineNumber);
+        }
+        else
+        {
+            fprintf(stdout, "%d %d", numChars, lineNumber);
+        }
+    }
+
+    return exitStatus;
 }
 
 /**
@@ -131,4 +207,24 @@ int nCommand()
         }
     }
     return exitStatus;
+}
+
+void compareWord(char* wordConstruct, char* word, int argI, int* matchOcc, int wordPos, int lineNumber)
+{
+    if(argI)
+    {
+         //make the word lowercase
+        size_t wordConLen = sizeof(wordConstruct);
+        for(size_t i = 0; i < wordConLen; ++i)
+        {
+            wordConstruct[i] = tolower(wordConstruct[i]);
+        }
+    }
+
+    if(strcmp(wordConstruct, word) == 0) //equal
+    {
+        ++matchOcc;
+        // keep track of line num and pos, print it out
+        fprintf(stdout, "%d:%d\n", lineNumber, wordPos);
+    }
 }

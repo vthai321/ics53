@@ -16,9 +16,21 @@ int lhParser(int flag, int argc, char** arg_str, int* argI, int* argS, int* argC
 
 /**
 Implements the -l command that counts words and has varying actions depending on flag.
+Implementation can be similar to nCommand. Read one char at a time and use a flag to determine existance of a word
+A word happens if charFlag = 0 and isWhitespace = 0, up to charFlag = 1 and isWhitespace = 1
+
+Special cases:
+Empty file: handle it using if statement
+Word at begnining of file: determine initial value of charFlag using the very first char
+Word at end of file: if statement: If charFlag = 1 and we reach eof, go ahead and increment wordCount by 1 before exiting
+Double space: just proceed with the loop
+
+Optional arguments:
+-I: case insenstive
+-S: print total number of chars, total number of lines to stderr, as well as number of occurances of word (if >=1 )
 
 */
-int lCommand(int argI, int argS);
+int lCommand(int argI, int argS, char* word);
 
 /**
 Implements the -h command that highlights words and has varying actions depending on flag
@@ -36,6 +48,14 @@ Check if a sequence of chars is all digits or perhaps if the token does not cont
 
 */
 int nCommand();
+
+/**
+Compares word according to our special rules
+Also prints to stdout
+
+*/
+
+void compareWord(char* wordConstruct, char* word, int argI, int* matchOcc, int wordPos, int lineNumber);
 
 
 # endif
