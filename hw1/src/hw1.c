@@ -80,7 +80,7 @@ int _53wgrep(int argc, char** arg_str)
         return exitStatus;
     }
 
-    char word[sizeof(arg_str[2]) + 1] = ""; //buffer
+    char* word = arg_str[2];
     
     if(argReq == 1)
     {

@@ -44,9 +44,6 @@ int lhParser(int argc, char** arg_str, int* argI, int* argS, int* argC, int* fg,
         }
         else
         {
-            char* theArg = arg_str[i];
-            printf("theArg: %s, i: %d\n", theArg, i);
-
             return 1; // invalid optional argument (duplicates, invalid values)
         }
     }
@@ -58,11 +55,13 @@ int lhParser(int argc, char** arg_str, int* argI, int* argS, int* argC, int* fg,
 int lCommand(int argI, int argS, char* word)
 {
     int lineNumber = 1;
-    int wordPos = 1;
+    int wordPos = 1; // note: increments by word, NOT by char
     int interestWordPos = 1;
     int matchOcc = 0;
     int exitStatus = 2;
-    char wordConstruct[sizeof(word) + 1] = ""; // more graceful
+    int iterateWord = 0; // iterates  word, up to length of word
+    int correctSoFar = 0;
+    int matchesWord = 1; // 1 up until first differing char
 
     //flags
     int notWhitespace = 0;
@@ -90,7 +89,14 @@ int lCommand(int argI, int argS, char* word)
             if(notWhitespace)
             {
                 // now compare the word
-                compareWord(wordConstruct, word, argI, &matchOcc, interestWordPos, lineNumber);
+                 if(matchesWord) //equal
+                {
+                    ++matchOcc;
+                    // keep track of line num and pos, print it out
+                    fprintf(stdout, "%d:%d\n", lineNumber, interestWordPos);
+                    iterateWord = 0;
+                }
+                
             }
             break; // end of file reached
         }
@@ -100,7 +106,7 @@ int lCommand(int argI, int argS, char* word)
         if(currentChar == '\n')
         {
             ++lineNumber;
-            wordPos = 1;
+            wordPos = 1; // change to 0 if this is incorrect
         }
         else if(isspace(currentChar) == 0) // begin or middle of word
         {
@@ -109,42 +115,64 @@ int lCommand(int argI, int argS, char* word)
                 //mark begining of word by setting interestWordPos value
                 interestWordPos = wordPos;
             }
+
+            if(argI)
+            {
+                currentChar = (char)tolower(currentChar);
+            }
+
+            if(currentChar != word[iterateWord])
+            {
+                matchesWord = 0;
+            }
+            else
+            {
+                correctSoFar++;
+            }
             
             notWhitespace = 1;
-            char currentCharCasted = (char)currentChar;
-            strncat(wordConstruct, &currentCharCasted, 1); 
+            ++iterateWord;
+
         }
-        else if(isspace(currentChar) == 1 && notWhitespace) //encountered whitespace at end of a word
+        else if(isspace(currentChar) != 0 && notWhitespace) //encountered whitespace at end of a word
         {
             notWhitespace = 0;
 
             // now compare the word
-            compareWord(wordConstruct, word, argI, &matchOcc, interestWordPos, lineNumber); 
+            if(matchesWord == 1 && correctSoFar == strlen(word)) //equal
+            {
+                ++matchOcc;
+                // keep track of line num and pos, print it out
+                fprintf(stdout, "%d:%d\n", lineNumber, interestWordPos);
+            }
             interestWordPos = wordPos;
+            matchesWord = 1;
+            iterateWord = 0;
+            correctSoFar = 0;
+            ++wordPos;
         }
-        ++numChars;
-        ++wordPos; // a counter for the pos in the line. 
-        wordConstruct[0] = '\0'; //reset the string
+        ++numChars; 
     }
 
     if(matchOcc > 0)
     {
         exitStatus = 0;
-        fprintf(stderr, "%d", matchOcc);
+        fprintf(stderr, "%d\n", matchOcc);
     }
 
     if(argS)
     {
         if(matchOcc > 0)
         {
-            fprintf(stdout, "%d %d %d", matchOcc, numChars, lineNumber);
+            fprintf(stdout, "%d %d %d\n", matchOcc, numChars, lineNumber);
         }
         else
         {
-            fprintf(stdout, "%d %d", numChars, lineNumber);
+            fprintf(stdout, "%d %d\n", numChars, lineNumber);
         }
     }
 
+    //printf("DEBUG: number of occurances: %d\n", matchOcc);
     return exitStatus;
 }
 
