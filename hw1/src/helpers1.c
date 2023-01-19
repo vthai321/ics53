@@ -76,16 +76,23 @@ int lCommand(int argI, int argS, char* word)
         size_t wordLen = strlen(word);
         for(size_t i = 0; i < wordLen; ++i)
         {
-            word[i] = (char)tolower(word[i]);
+            if(isalpha(word[i]))
+            {
+                word[i] = (char)tolower(word[i]);
+            }
         }
     }
 
     // reuse algorithms from -n
     while(1)
     {
+        int currentChar = getchar(); //ascii value
+        ++numChars; 
+        
         if(feof(stdin))
         {
             //add some mechanism to check if the last char belongs to a word we look for
+            --numChars; // i think EOF is not a char
             if(notWhitespace)
             {
                 // now compare the word
@@ -100,15 +107,8 @@ int lCommand(int argI, int argS, char* word)
             }
             break; // end of file reached
         }
-       
-        int currentChar = getchar(); //ascii value
-
-        if(currentChar == '\n')
-        {
-            ++lineNumber;
-            wordPos = 1; // change to 0 if this is incorrect
-        }
-        else if(isspace(currentChar) == 0) // begin or middle of word
+        
+        if(isspace(currentChar) == 0) // begin or middle of word
         {
             if(notWhitespace == 0)
             {
@@ -118,7 +118,10 @@ int lCommand(int argI, int argS, char* word)
 
             if(argI)
             {
-                currentChar = (char)tolower(currentChar);
+                if(isalpha(currentChar))
+                {
+                    currentChar = (char)tolower(currentChar);
+                }
             }
 
             if(currentChar != word[iterateWord])
@@ -134,7 +137,7 @@ int lCommand(int argI, int argS, char* word)
             ++iterateWord;
 
         }
-        else if(isspace(currentChar) != 0 && notWhitespace) //encountered whitespace at end of a word
+        else if(isspace(currentChar) != 0 && notWhitespace || currentChar == '\n') //encountered whitespace at end of a word or a newline char
         {
             notWhitespace = 0;
 
@@ -145,30 +148,37 @@ int lCommand(int argI, int argS, char* word)
                 // keep track of line num and pos, print it out
                 fprintf(stdout, "%d:%d\n", lineNumber, interestWordPos);
             }
+            
+            
             interestWordPos = wordPos;
             matchesWord = 1;
             iterateWord = 0;
             correctSoFar = 0;
-            ++wordPos;
+            
+            if(currentChar == '\n')
+            {
+                lineNumber++;
+                wordPos = 1;
+            }
+            else
+            {
+                ++wordPos;
+            }
+            
         }
-        ++numChars; 
     }
 
-    if(matchOcc > 0)
+    if(matchOcc > 0 && argS != 1)
     {
         exitStatus = 0;
         fprintf(stderr, "%d\n", matchOcc);
     }
-
-    if(argS)
+    else if(argS)
     {
         if(matchOcc > 0)
         {
-            fprintf(stdout, "%d %d %d\n", matchOcc, numChars, lineNumber);
-        }
-        else
-        {
-            fprintf(stdout, "%d %d\n", numChars, lineNumber);
+            exitStatus = 0;
+            fprintf(stderr, "%d %d %d\n", matchOcc, numChars, lineNumber);
         }
     }
 
@@ -213,26 +223,6 @@ int nCommand()
         }
     }
     return exitStatus;
-}
-
-void compareWord(char* wordConstruct, char* word, int argI, int* matchOcc, int wordPos, int lineNumber)
-{
-    if(argI)
-    {
-         //make the word lowercase
-        size_t wordConLen = strlen(wordConstruct);
-        for(size_t i = 0; i < wordConLen; ++i)
-        {
-            wordConstruct[i] = (char)tolower(wordConstruct[i]);
-        }
-    }
-
-    if(strcmp(wordConstruct, word) == 0) //equal
-    {
-        ++matchOcc;
-        // keep track of line num and pos, print it out
-        fprintf(stdout, "%d:%d\n", lineNumber, wordPos);
-    }
 }
 
 int argumentCounter(int flag, int argc)
