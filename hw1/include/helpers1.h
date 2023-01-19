@@ -12,7 +12,7 @@
 If -l or -h is supplied, uses a for-loop to parse through and process any optional arguments present
 
 */
-int lhParser(int flag, int argc, char** arg_str, int* argI, int* argS, int* argC, int* fg, int* bg, char** word); 
+int lhParser(int argc, char** arg_str, int* argI, int* argS, int* argC, int* fg, int* bg); 
 
 /**
 Implements the -l command that counts words and has varying actions depending on flag.
@@ -56,6 +56,13 @@ Also prints to stdout
 */
 
 void compareWord(char* wordConstruct, char* word, int argI, int* matchOcc, int wordPos, int lineNumber);
+
+/**
+Argument counter to see if amount of arguments is valid 
+
+*/
+int argumentCounter(int flag, int argc);
+
 
 
 # endif

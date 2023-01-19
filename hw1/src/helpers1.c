@@ -1,42 +1,19 @@
 // Declare all helper functions for hw1 in this file
 #include "helpers1.h"
 
-int lhParser(int flag, int argc, char** arg_str, int* argI, int* argS, int* argC, int* fg, int* bg, char** word)
-{
-    int maxArgs = 0;
-
-    if(flag == 1)
-    {
-        maxArgs = 5;
-
-    }
-    else if(flag == 2)
-    {
-        maxArgs = 8;
-    }
-    else
-    {
-        return 1; // not -l or -h
-    }
-
-    if(argc > maxArgs)
-    {
-        return 1; // too many arguments
-    }
-    *word = arg_str[2];
-        
+int lhParser(int argc, char** arg_str, int* argI, int* argS, int* argC, int* fg, int* bg)
+{         
     for(int i = 3; i < argc; ++i)
     {
-
-        if(strcmp(arg_str[i], "-I") == 0 && argI == 0) 
+        if(strcmp(arg_str[i], "-I") == 0 && *argI == 0) 
         {
             *argI = 1;
         }
-        else if(strcmp(arg_str[i], "-S") == 0 && argS == 0) 
+        else if(strcmp(arg_str[i], "-S") == 0 && *argS == 0) 
         {
             *argS = 1;
         }
-        else if(strcmp(arg_str[i], "-C") == 0 && argC == 0) 
+        else if(strcmp(arg_str[i], "-C") == 0 && *argC == 0) 
         {
             *argC = 1;
             // assume we can retrieve FG and BG
@@ -60,14 +37,16 @@ int lhParser(int flag, int argc, char** arg_str, int* argI, int* argS, int* argC
             }
             else
             {
-                
                 return 1; // invalid bg argument
             }
-            i = argc; // end the loop 
+            i += 2; //to account for also processing the fg and bg 
             
         }
         else
         {
+            char* theArg = arg_str[i];
+            printf("theArg: %s, i: %d\n", theArg, i);
+
             return 1; // invalid optional argument (duplicates, invalid values)
         }
     }
@@ -83,7 +62,7 @@ int lCommand(int argI, int argS, char* word)
     int interestWordPos = 1;
     int matchOcc = 0;
     int exitStatus = 2;
-    char wordConstruct[1024] = "";
+    char wordConstruct[sizeof(word) + 1] = ""; // more graceful
 
     //flags
     int notWhitespace = 0;
@@ -95,13 +74,12 @@ int lCommand(int argI, int argS, char* word)
     if(argI)
     {
         //make the word lowercase
-        size_t wordLen = sizeof(word);
+        size_t wordLen = strlen(word);
         for(size_t i = 0; i < wordLen; ++i)
         {
-            word[i] = tolower(word[i]);
+            word[i] = (char)tolower(word[i]);
         }
     }
-
 
     // reuse algorithms from -n
     while(1)
@@ -146,11 +124,13 @@ int lCommand(int argI, int argS, char* word)
         }
         ++numChars;
         ++wordPos; // a counter for the pos in the line. 
+        wordConstruct[0] = '\0'; //reset the string
     }
 
     if(matchOcc > 0)
     {
         exitStatus = 0;
+        fprintf(stderr, "%d", matchOcc);
     }
 
     if(argS)
@@ -169,7 +149,7 @@ int lCommand(int argI, int argS, char* word)
 }
 
 /**
-Implements the -n command that counts the amount of numbers in a given text
+Implements the -n command that counts the amount of numbers in a x text
 A number is defined as a sequence of numbers
 
 Read char by char (or token by token?); read line as str 
@@ -180,7 +160,6 @@ Check if a sequence of chars is all digits or perhaps if the token does not cont
 int nCommand()
 {
     int numberFlag = 0; // 1 if we encounter a number, 0 if we encounter any other, etc.
-    char num[1024] = ""; // constructs the number to print. review buffer with TA!
     int exitStatus = 2; // 0 for success, 2 for no occurance of numbers
 
     while(1)
@@ -197,13 +176,12 @@ int nCommand()
             exitStatus = 0; // not efficient but oh well
             numberFlag = 1;
             char currentCharCasted = (char)currentChar;
-            strncat(num, &currentCharCasted, 1); 
+            fprintf(stdout, "%c", currentCharCasted);
         }
         else if(numberFlag) //encountered a number but encountered something not a digit
         {
             numberFlag = 0;
-            fprintf(stdout, "%s\n", num);
-             num[0] = '\0'; // clear the string
+            fprintf(stdout, "\n");
         }
     }
     return exitStatus;
@@ -214,10 +192,10 @@ void compareWord(char* wordConstruct, char* word, int argI, int* matchOcc, int w
     if(argI)
     {
          //make the word lowercase
-        size_t wordConLen = sizeof(wordConstruct);
+        size_t wordConLen = strlen(wordConstruct);
         for(size_t i = 0; i < wordConLen; ++i)
         {
-            wordConstruct[i] = tolower(wordConstruct[i]);
+            wordConstruct[i] = (char)tolower(wordConstruct[i]);
         }
     }
 
@@ -227,4 +205,31 @@ void compareWord(char* wordConstruct, char* word, int argI, int* matchOcc, int w
         // keep track of line num and pos, print it out
         fprintf(stdout, "%d:%d\n", lineNumber, wordPos);
     }
+}
+
+int argumentCounter(int flag, int argc)
+{
+    int maxArgs = 0;
+
+    if(flag == 1) // -l
+    {
+        maxArgs = 5;
+
+    }
+    else if(flag == 2) // -h
+    {
+        maxArgs = 8;
+    }
+    else
+    {
+        fprintf(stderr, USAGE);
+        return 1; // not -l or -h
+    }
+
+    if(argc > maxArgs)
+    {
+        fprintf(stderr, USAGE);
+        return 1; // too many arguments
+    }
+    return 0; // everything works out.
 }

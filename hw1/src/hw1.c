@@ -10,8 +10,6 @@ int _53wgrep(int argc, char** arg_str)
     // n = 0, l = 1, h = 2
     int argReq = -1;
 
-    // Word to check for 
-    char* word = "";
 
     // -I and -S flags
     int argI = 0;
@@ -36,15 +34,42 @@ int _53wgrep(int argc, char** arg_str)
         }
         argReq = 0; // flag for n set true
     }
-    else
+    else if(strcmp(arg_str[1], "-l") == 0)
     {
-        int lhParseResult = lhParser(argReq, argc, arg_str, &argI, &argS, &argC, &fg, &bg, &word);
+        argReq = 1;
+        if(argumentCounter(argReq, argc) == 1)
+        {
+            fprintf(stderr, USAGE);
+            return 1;
+        }
+        int lhParseResult = lhParser(argc, arg_str, &argI, &argS, &argC, &fg, &bg);
+        if(lhParseResult == 1)
+        {
+            
+            fprintf(stderr, USAGE);
+            return 1; // we had an error code!! 
+        }
+    }
+    else if(strcmp(arg_str[1], "-h") == 0)
+    {
+        argReq = 2;
+        if(argumentCounter(argReq, argc) == 1)
+        {
+            fprintf(stderr, USAGE);
+            return 1;
+        }
+        int lhParseResult = lhParser(argc, arg_str, &argI, &argS, &argC, &fg, &bg);
         if(lhParseResult = 1)
         {
             
             fprintf(stderr, USAGE);
             return 1; // we had an error code!! 
         }
+    }
+    else
+    {
+        fprintf(stderr, USAGE);
+        return 1; // we had an error code!!
     }
 
     int exitStatus = 0;
@@ -54,16 +79,15 @@ int _53wgrep(int argc, char** arg_str)
         exitStatus = nCommand();
         return exitStatus;
     }
-    else if(argReq == 1)
+
+    char word[sizeof(arg_str[2]) + 1] = ""; //buffer
+    
+    if(argReq == 1)
     {
-        // -l
-
-        //write a -l function that takes in relevant flags to determine course of action
-
-        // read by token
-
+        exitStatus = lCommand(argI, argS, word);
+        return exitStatus;
     }
-    else if(argReq = 2)
+    else if(argReq == 2)
     {
         // -h
 
