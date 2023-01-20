@@ -204,7 +204,7 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
     int matchOcc = 0;
     int exitStatus = 2;
     int iterateWord = 0; // iterates  word, up to length of word
-    // int correctSoFar = 0; possibly not needed 
+    int correctSoFar = 0; 
     //int matchesWord = 1; // 1 up until first differing char; possibly not needed
     int lineNumber = 0;
     char wordBuffer[sizeof(word)] = ""; // if strlen + 1 equals sizeof(word), immediately proceed to print. Null terminator alr included?
@@ -215,6 +215,16 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
 
     // for -S
     int numChars = 0;
+
+    //fg and bg as str
+    char fgStr[3]; 
+    char bgStr[4];
+
+    sprintf(fgStr, "%d", fg);
+    sprintf(bgStr, "%dm", bg);
+
+    //default escape code
+    char defaultEscape[] = "\x1B[39;49m";
 
     if(argI)
     {
@@ -242,10 +252,9 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
         {
             if(isalpha(currentChar))
             {
-                currentChar = (char)tolower(currentChar);
+                currentChar = tolower(currentChar);
             }
         }
-
 
         if(feof(stdin))
         {
@@ -257,10 +266,22 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
                 if(strcmp(word, wordBuffer) != 0) //equal
                 {
                     //proceed to print with highlight
+                    char escapeCode[11] = "\x1B[";
+                    strncat(escapeCode, fgStr, 3);
+                    strncat(escapeCode, ";", 2);
+                    strncat(escapeCode, bgStr, 4);
+
+                    fprintf(stdout, "%s", escapeCode);
+                    //reset escape code
+                    fprintf(stdout, "%s", defaultEscape);
+
                 }
                 else
                 {
                     //print with no highlight
+                    fprintf(stdout, "%s", wordBuffer);
+                    wordBuffer[0] = '\0';
+                    iterateWord = 0;
                 }
             }
             break; // end of file reached
@@ -277,7 +298,7 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
             {
                 // kill switch, proceed to print without highlight
                 fprintf(stdout, "%s", wordBuffer);
-                wordBuffer[0] = '\0'
+                wordBuffer[0] = '\0';
                 iterateWord = 0;
             }
             else
@@ -292,23 +313,33 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
             // initiates sequence to compare the word
             // you've won, now do the escape sequence thing
             
-            if(matchesWord == 1 && correctSoFar == strlen(word)) //equal
+            if(correctSoFar == strlen(word)) //equal
             {
-                
+                char escapeCode[11] = "\x1B[";
+                strncat(escapeCode, fgStr, 3);
+                strncat(escapeCode, ";", 2);
+                strncat(escapeCode, bgStr, 4);
+
+                fprintf(stdout, "%s", escapeCode);
+                //reset escape code
+                fprintf(stdout, "%s", defaultEscape);
             }
             
-            matchesWord = 1;
             iterateWord = 0;
             correctSoFar = 0;            
         }
-        else if(currentChar != word[iterateWord])
+        else if(currentChar != word[iterateWord] && correctSoFar > 0) 
         {
             //you lost, print what you have (no highlight)
+                fprintf(stdout, "%s", wordBuffer);
+                wordBuffer[0] = '\0';
+                iterateWord = 0;
+                correctSoFar = 0;
         }
         else
         {
             // proceed as normal. print the char to stdout
-            fprintf(stdout, currentChar);
+            fprintf(stdout, "%c", (char)currentChar);
         }
     }
 
