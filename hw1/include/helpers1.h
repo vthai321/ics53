@@ -36,8 +36,17 @@ int lCommand(int argI, int argS, char* word);
 Implements the -h command that highlights words and has varying actions depending on flag
 fg and bg are used depending on value of argC
 
+Using the modified algorithm for l, parse char by char through the text and print each char. HOWEVER, if you encounter the same start
+char as the target word, start building a string and stop printing char by char. If we follow to the end of the word (whitespace or \n) and it matches, 
+then set the special escape codes and print that word to output. If it ends up not matching, we immediately print what we have (no special colors), 
+and go back to printing char by char
+
+-I is case insensitive
+-S is to count total number of char and lines and occurrances (only if numOcc > 1)
+
+
 */
-int hCommand(int argI, int argS, int argC, int fg, int bg);
+int hCommand(int argI, int argS, int argC, int fg, int bg, char* word);
 
 /**
 Implements the -n command that counts the amount of numbers in a given text
@@ -54,6 +63,7 @@ Compares word according to our special rules
 Also prints to stdout
 
 */
+
 
 void compareWord(char* wordConstruct, char* word, int argI, int* matchOcc, int wordPos, int lineNumber);
 

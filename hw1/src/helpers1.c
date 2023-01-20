@@ -149,7 +149,6 @@ int lCommand(int argI, int argS, char* word)
                 fprintf(stdout, "%d:%d\n", lineNumber, interestWordPos);
             }
             
-            
             interestWordPos = wordPos;
             matchesWord = 1;
             iterateWord = 0;
@@ -185,6 +184,152 @@ int lCommand(int argI, int argS, char* word)
     //printf("DEBUG: number of occurances: %d\n", matchOcc);
     return exitStatus;
 }
+
+/**
+Implements the -h command that highlights words and has varying actions depending on flag
+fg and bg are used depending on value of argC
+
+Using the modified algorithm for l, parse char by char through the text and print each char. HOWEVER, if you encounter the same start
+char as the target word, start building a string and stop printing char by char. If we follow to the end of the word (whitespace or \n) and it matches, 
+then set the special escape codes and print that word to output. If it ends up not matching, we immediately print what we have (no special colors), 
+and go back to printing char by char
+
+-I is case insensitive
+-S is to count total number of char and lines and occurrances (only if numOcc > 1)
+
+
+*/
+int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
+{
+    int matchOcc = 0;
+    int exitStatus = 2;
+    int iterateWord = 0; // iterates  word, up to length of word
+    // int correctSoFar = 0; possibly not needed 
+    //int matchesWord = 1; // 1 up until first differing char; possibly not needed
+    int lineNumber = 0;
+    char wordBuffer[sizeof(word)] = ""; // if strlen + 1 equals sizeof(word), immediately proceed to print. Null terminator alr included?
+
+    //flags
+    int notWhitespace = 0;
+    int charFlag = 0;
+
+    // for -S
+    int numChars = 0;
+
+    if(argI)
+    {
+        //make the word lowercase
+        size_t wordLen = strlen(word);
+        for(size_t i = 0; i < wordLen; ++i)
+        {
+            if(isalpha(word[i]))
+            {
+                word[i] = (char)tolower(word[i]);
+            }
+        }
+    }
+
+    // reuse algorithms from -l
+    while(1)
+    {
+        int currentChar = getchar(); //ascii value
+        ++numChars; 
+        if(currentChar == '\n')
+        {
+            ++lineNumber;
+        }
+        if(argI)
+        {
+            if(isalpha(currentChar))
+            {
+                currentChar = (char)tolower(currentChar);
+            }
+        }
+
+
+        if(feof(stdin))
+        {
+            //add some mechanism to check if the last char belongs to a word we look for
+            --numChars; // i think EOF is not a char
+            if(notWhitespace)
+            {
+                // now compare the word with strcmp
+                if(strcmp(word, wordBuffer) != 0) //equal
+                {
+                    //proceed to print with highlight
+                }
+                else
+                {
+                    //print with no highlight
+                }
+            }
+            break; // end of file reached
+        }
+        
+        if(currentChar == word[iterateWord]) // change to if we encounter a matching first char (and subsequent matches)
+        {
+            
+            notWhitespace = 1;
+            ++iterateWord;
+
+            //check the bounds and add to buffer
+            if(strlen(wordBuffer) == sizeof(word))
+            {
+                // kill switch, proceed to print without highlight
+                fprintf(stdout, "%s", wordBuffer);
+                wordBuffer[0] = '\0'
+                iterateWord = 0;
+            }
+            else
+            {
+                wordBuffer[iterateWord] = word[iterateWord];
+            }
+        }
+        else if(isspace(currentChar) != 0 && notWhitespace || currentChar == '\n') //encountered whitespace at end of a word or a newline char
+        {
+            notWhitespace = 0;
+
+            // initiates sequence to compare the word
+            // you've won, now do the escape sequence thing
+            
+            if(matchesWord == 1 && correctSoFar == strlen(word)) //equal
+            {
+                
+            }
+            
+            matchesWord = 1;
+            iterateWord = 0;
+            correctSoFar = 0;            
+        }
+        else if(currentChar != word[iterateWord])
+        {
+            //you lost, print what you have (no highlight)
+        }
+        else
+        {
+            // proceed as normal. print the char to stdout
+            fprintf(stdout, currentChar);
+        }
+    }
+
+    if(matchOcc > 0 && argS != 1)
+    {
+        exitStatus = 0;
+        fprintf(stderr, "%d\n", matchOcc);
+    }
+    else if(argS)
+    {
+        if(matchOcc > 0)
+        {
+            exitStatus = 0;
+            fprintf(stderr, "%d %d %d\n", matchOcc, numChars, lineNumber);
+        }
+    }
+
+    //printf("DEBUG: number of occurances: %d\n", matchOcc);
+    return exitStatus;    
+}
+
 
 /**
 Implements the -n command that counts the amount of numbers in a x text
