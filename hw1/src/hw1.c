@@ -5,7 +5,7 @@ int _53wgrep(int argc, char** arg_str)
 {
     //directly grab arguments needed from argv
     //use argc for # of arguments
-    
+      
     // required argument flags
     // n = 0, l = 1, h = 2
     int argReq = -1;
@@ -59,9 +59,8 @@ int _53wgrep(int argc, char** arg_str)
             return 1;
         }
         int lhParseResult = lhParser(argc, arg_str, &argI, &argS, &argC, &fg, &bg);
-        if(lhParseResult = 1)
+        if(lhParseResult == 1)
         {
-            
             fprintf(stderr, USAGE);
             return 1; // we had an error code!! 
         }
@@ -92,6 +91,8 @@ int _53wgrep(int argc, char** arg_str)
         // -h
 
         //write a -h function taking in relevant flags and values
+        exitStatus = hCommand(argI, argS, argC, fg, bg, word);
+        return exitStatus;
 
         // read by token
     }

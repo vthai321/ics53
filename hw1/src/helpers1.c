@@ -219,10 +219,16 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
     //fg and bg as str
     char fgStr[3]; 
     char bgStr[4];
-
-    sprintf(fgStr, "%d", fg);
-    sprintf(bgStr, "%dm", bg);
-
+    if(argC)
+    {
+        sprintf(fgStr, "%d", fg);
+        sprintf(bgStr, "%dm", bg);
+    }
+    else
+    {
+        sprintf(fgStr, "37");
+        sprintf(bgStr, "41m");
+    }
     //default escape code
     char defaultEscape[] = "\x1B[39;49m";
 
@@ -272,15 +278,15 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
                     strncat(escapeCode, bgStr, 4);
 
                     fprintf(stdout, "%s", escapeCode);
+                    fprintf(stdout, "%s", wordBuffer);
                     //reset escape code
                     fprintf(stdout, "%s", defaultEscape);
-
                 }
                 else
                 {
                     //print with no highlight
                     fprintf(stdout, "%s", wordBuffer);
-                    wordBuffer[0] = '\0';
+                    memset(wordBuffer, 0, strlen(wordBuffer));
                     iterateWord = 0;
                 }
             }
@@ -291,28 +297,29 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
         {
             
             notWhitespace = 1;
-            ++iterateWord;
-
             //check the bounds and add to buffer
-            if(strlen(wordBuffer) == sizeof(word))
+            if(strlen(wordBuffer) + 1 == sizeof(word))
             {
                 // kill switch, proceed to print without highlight
                 fprintf(stdout, "%s", wordBuffer);
-                wordBuffer[0] = '\0';
+                memset(wordBuffer, 0, strlen(wordBuffer));
                 iterateWord = 0;
+                correctSoFar = 0;
             }
             else
             {
                 wordBuffer[iterateWord] = word[iterateWord];
             }
+            ++iterateWord;
+            ++correctSoFar;
+            
         }
-        else if(isspace(currentChar) != 0 && notWhitespace || currentChar == '\n') //encountered whitespace at end of a word or a newline char
+        else if(isspace(currentChar) != 0 && notWhitespace || currentChar == '\n' && notWhitespace) //encountered whitespace at end of a word or a newline char
         {
             notWhitespace = 0;
 
             // initiates sequence to compare the word
-            // you've won, now do the escape sequence thing
-            
+
             if(correctSoFar == strlen(word)) //equal
             {
                 char escapeCode[11] = "\x1B[";
@@ -321,20 +328,27 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
                 strncat(escapeCode, bgStr, 4);
 
                 fprintf(stdout, "%s", escapeCode);
+                fprintf(stdout, "%s", wordBuffer);
                 //reset escape code
                 fprintf(stdout, "%s", defaultEscape);
             }
+            fprintf(stdout, "%c", currentChar);
             
             iterateWord = 0;
-            correctSoFar = 0;            
+            correctSoFar = 0;
+            memset(wordBuffer, 0, strlen(wordBuffer));
+
         }
         else if(currentChar != word[iterateWord] && correctSoFar > 0) 
         {
             //you lost, print what you have (no highlight)
-                fprintf(stdout, "%s", wordBuffer);
-                wordBuffer[0] = '\0';
-                iterateWord = 0;
-                correctSoFar = 0;
+            //printf("DEBUG: Here's what's in wordBuffer so far: %s\n", wordBuffer);
+            fprintf(stdout, "%s", wordBuffer);
+            memset(wordBuffer, 0, strlen(wordBuffer));
+            iterateWord = 0;
+            correctSoFar = 0;
+
+            fprintf(stdout, "%c", (char)currentChar);
         }
         else
         {
