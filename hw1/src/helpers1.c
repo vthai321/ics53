@@ -206,8 +206,10 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
     int iterateWord = 0; // iterates  word, up to length of word
     int correctSoFar = 0; 
     //int matchesWord = 1; // 1 up until first differing char; possibly not needed
-    int lineNumber = 0;
+    int lineNumber = 1;
     char wordBuffer[sizeof(word)] = ""; // if strlen + 1 equals sizeof(word), immediately proceed to print. Null terminator alr included?
+    char wordCheck[sizeof(word)] = ""; // differs only if -I flag is used.
+    strncpy(wordCheck, word, sizeof(word));
 
     //flags
     int notWhitespace = 0;
@@ -234,21 +236,19 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
 
     if(argI)
     {
-        //make the word lowercase
+        //make the wordCheck lowercase
         size_t wordLen = strlen(word);
         for(size_t i = 0; i < wordLen; ++i)
         {
-            if(isalpha(word[i]))
-            {
-                word[i] = (char)tolower(word[i]);
-            }
+                wordCheck[i] = (char)tolower(word[i]);
         }
     }
 
     // reuse algorithms from -l
     while(1)
-    {
+    {      
         int currentChar = getchar(); //ascii value
+        int currentCharCheck = currentChar; //will differ only if -I flag is used
         ++numChars; 
         if(currentChar == '\n')
         {
@@ -258,7 +258,7 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
         {
             if(isalpha(currentChar))
             {
-                currentChar = tolower(currentChar);
+                currentCharCheck = tolower(currentChar);
             }
         }
 
@@ -269,8 +269,10 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
             if(notWhitespace)
             {
                 // now compare the word with strcmp
-                if(strcmp(word, wordBuffer) != 0) //equal
+                int debug = strcmp(wordCheck, wordBuffer);
+                if(correctSoFar == strlen(wordCheck)) //equal
                 {
+                    ++matchOcc;
                     //proceed to print with highlight
                     char escapeCode[11] = "\x1B[";
                     strncat(escapeCode, fgStr, 3);
@@ -293,12 +295,11 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
             break; // end of file reached
         }
         
-        if(currentChar == word[iterateWord]) // change to if we encounter a matching first char (and subsequent matches)
+        if(currentCharCheck == wordCheck[iterateWord]) // if we encounter a matching first char (and subsequent matches)
         {
-            
             notWhitespace = 1;
             //check the bounds and add to buffer
-            if(strlen(wordBuffer) + 1 == sizeof(word))
+            if(sizeof(wordBuffer) + 1 == sizeof(wordCheck))
             {
                 // kill switch, proceed to print without highlight
                 fprintf(stdout, "%s", wordBuffer);
@@ -308,13 +309,13 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
             }
             else
             {
-                wordBuffer[iterateWord] = word[iterateWord];
+                wordBuffer[iterateWord] = currentChar;
             }
             ++iterateWord;
             ++correctSoFar;
             
         }
-        else if(isspace(currentChar) != 0 && notWhitespace || currentChar == '\n' && notWhitespace) //encountered whitespace at end of a word or a newline char
+        else if(isspace(currentCharCheck) != 0 && notWhitespace || currentCharCheck == '\n' && notWhitespace) //encountered whitespace at end of a word or a newline char
         {
             notWhitespace = 0;
 
@@ -322,6 +323,7 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
 
             if(correctSoFar == strlen(word)) //equal
             {
+                ++matchOcc;
                 char escapeCode[11] = "\x1B[";
                 strncat(escapeCode, fgStr, 3);
                 strncat(escapeCode, ";", 2);
@@ -332,6 +334,11 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
                 //reset escape code
                 fprintf(stdout, "%s", defaultEscape);
             }
+            else
+            {
+                // print what you have
+                fprintf(stdout, "%s", wordBuffer);
+            }
             fprintf(stdout, "%c", currentChar);
             
             iterateWord = 0;
@@ -339,10 +346,10 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
             memset(wordBuffer, 0, strlen(wordBuffer));
 
         }
-        else if(currentChar != word[iterateWord] && correctSoFar > 0) 
+        else if(currentCharCheck != wordCheck[iterateWord] && correctSoFar > 0) 
         {
             //you lost, print what you have (no highlight)
-            //printf("DEBUG: Here's what's in wordBuffer so far: %s\n", wordBuffer);
+            //printf("What we have at lost: %s ", wordBuffer);
             fprintf(stdout, "%s", wordBuffer);
             memset(wordBuffer, 0, strlen(wordBuffer));
             iterateWord = 0;
@@ -357,16 +364,11 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
         }
     }
 
-    if(matchOcc > 0 && argS != 1)
+    if(matchOcc > 0)
     {
         exitStatus = 0;
-        fprintf(stderr, "%d\n", matchOcc);
-    }
-    else if(argS)
-    {
-        if(matchOcc > 0)
+        if(argS)
         {
-            exitStatus = 0;
             fprintf(stderr, "%d %d %d\n", matchOcc, numChars, lineNumber);
         }
     }
