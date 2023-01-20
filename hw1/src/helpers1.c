@@ -214,6 +214,7 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
     //flags
     int notWhitespace = 0;
     int charFlag = 0;
+    int startCheck = 0; //can only activate if we start from whitespace
 
     // for -S
     int numChars = 0;
@@ -295,7 +296,28 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
             break; // end of file reached
         }
         
-        if(currentCharCheck == wordCheck[iterateWord]) // if we encounter a matching first char (and subsequent matches)
+
+        if(startCheck == 0 && notWhitespace == 0 && currentCharCheck == wordCheck[0]) // beginning of a word 
+        {
+             notWhitespace = 1;
+            //check the bounds and add to buffer
+            if(sizeof(wordBuffer) + 1 == sizeof(wordCheck))
+            {
+                // kill switch, proceed to print without highlight
+                fprintf(stdout, "%s", wordBuffer);
+                memset(wordBuffer, 0, strlen(wordBuffer));
+                iterateWord = 0;
+                correctSoFar = 0;
+            }
+            else
+            {
+                wordBuffer[iterateWord] = currentChar;
+            }
+            ++iterateWord;
+            ++correctSoFar;
+            startCheck = 1;
+        }
+        else if(iterateWord > 0 && currentCharCheck == wordCheck[iterateWord] && startCheck) // in the middle of checking
         {
             notWhitespace = 1;
             //check the bounds and add to buffer
@@ -318,6 +340,7 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
         else if(isspace(currentCharCheck) != 0 && notWhitespace || currentCharCheck == '\n' && notWhitespace) //encountered whitespace at end of a word or a newline char
         {
             notWhitespace = 0;
+            startCheck = 0;
 
             // initiates sequence to compare the word
 
@@ -360,6 +383,15 @@ int hCommand(int argI, int argS, int argC, int fg, int bg, char* word)
         else
         {
             // proceed as normal. print the char to stdout
+            if(isspace(currentChar) == 0)
+            {
+                notWhitespace = 1;
+            }
+            else
+            {
+                notWhitespace = 0;
+            }
+            
             fprintf(stdout, "%c", (char)currentChar);
         }
     }
