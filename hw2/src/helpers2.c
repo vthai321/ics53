@@ -12,7 +12,7 @@ int myStrcmp(char* string1, char* string2)
 
     do
     {
-        currentString1 = *(string1 + string2Offset);
+        currentString1 = *(string1 + string1Offset);
         currentString2 = *(string2 + string2Offset);
         
         if(currentString1 < currentString2)
@@ -25,6 +25,9 @@ int myStrcmp(char* string1, char* string2)
             comparisonStatus = 1;
             return comparisonStatus;
         }
+
+        ++string1Offset;
+        ++string2Offset;
 
     }
     while(currentString1 != '\0' || currentString2 != '\0');

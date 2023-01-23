@@ -43,6 +43,7 @@ char* myStrCpy(char* str, char* delimiters)
         {
             *(newStr + offset) = currentChar;
         }
+        ++offset;
 
     }
     return newStr;
