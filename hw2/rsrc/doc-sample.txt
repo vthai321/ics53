@@ -1,0 +1,10 @@
+c09765e,1636949442,Jennifer Wong-Ma,jwongma@uci.edu,Fall 2021 Bombsweeper Edition
+2       1       MarsSplashScreen.java
+411     0       tools/ICS51_Minesweeper.java
+1       7       mars/venus/HelpAboutAction.java
+
+4780299,1613965135,Jennifer Wong-Ma,jwongma@uci.edu,tag: 51_Winter_Sudoku,ICS51 Winter 2021 Sudoku Edition
+1       1       MarsSplashScreen.java
+421     421     tools/ICS51_Gomoku_15.java
+421     421     tools/ICS51_Gomoku_19.java
+427     0       tools/ICS51_Sudoku.java

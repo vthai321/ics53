@@ -1,0 +1,110 @@
+7772df4,1650516030,Joshua Costa,costa.joshua27@gmail.com,HEAD -> main, origin/main, origin/HEAD,Update README.md
+3	1	README.md
+
+a17c283,1645980717,Joshua Costa,costa.joshua27@gmail.com,,Update README.md
+1	1	README.md
+
+fc3993c,1645978925,Joshua Costa,costa.joshua27@gmail.com,,Final
+57	0	client/package-lock.json
+3	0	client/package.json
+39	1	client/src/App.vue
+5	2	client/src/components/Recognition.vue
+56	0	client/src/components/Transcription.vue
+21	7	client/src/components/Transcriptions.vue
+8	1	client/src/main.js
+3	0	client/src/store/index.js
+224	10	client/src/views/Home.vue
+21	7	client/src/views/Results.vue
+10	7	server/app.js
+50	23	server/helpers.js
+915	0	server/package-lock.json
+1	0	server/package.json
+
+82b42e1,1645969676,Jhuangia,jialh1@uci.edu,,Implement backend, stuck on creating video
+54	13	server/app.js
+155	44	server/helpers.js
+142	0	server/package-lock.json
+2	0	server/package.json
+
+cedc1c2,1645946269,Joshua Costa,costa.joshua27@gmail.com,,Fixed master audio creation
+1	2	server/app.js
+4	1	server/helpers.js
+
+b902a35,1645940607,Joshua Costa,costa.joshua27@gmail.com,,Remove extra line
+0	4	server/app.js
+
+4f60892,1645940427,Joshua Costa,costa.joshua27@gmail.com,,Got most things working
+20	6	client/package-lock.json
+2	0	client/package.json
+17	2	client/src/components/Recognition.vue
+9	1	client/src/store/index.js
+28	0	client/src/views/Home.vue
+41	2	client/src/views/Results.vue
+12	4	server/app.js
+25	12	server/helpers.js
+
+64ebb38,1645927405,Jhuangia,jialh1@uci.edu,,Implemented image downloader based off transcript
+13	4	server/app.js
+56	2	server/helpers.js
+55	0	server/package-lock.json
+2	0	server/package.json
+
+1534274,1645916491,Joshua Costa,costa.joshua27@gmail.com,,Added sessions
+3	0	.gitignore
+0	3	client/src/views/Home.vue
+50	47	server/app.js
+51	19	server/helpers.js
+19	0	server/package-lock.json
+1	0	server/package.json
+
+6daf1c1,1645915762,Jhuangia,jialh1@uci.edu,,Update determineSoundClip, returns name of soundClip
+36	0	server/helpers.js
+
+56c11e8,1645872294,Joshua Costa,costa.joshua27@gmail.com,,Added the text to speech
+13	2	server/app.js
+20	0	server/helpers.js
+444	1	server/package-lock.json
+3	1	server/package.json
+
+d3cadd6,1645871314,Jhuangia,jialh1@uci.edu,,Finish socket endpoint for processing transcription
+3	0	client/src/views/Home.vue
+54	5	server/app.js
+
+158746b,1645865320,Joshua Costa,costa.joshua27@gmail.com,,Added first start with google api
+18	2	server/app.js
+1365	4	server/package-lock.json
+1	0	server/package.json
+
+5cb0c1b,1645863963,Joshua Costa,costa.joshua27@gmail.com,,Added start of client, server
+23	0	client/.gitignore
+19	0	client/README.md
+5	0	client/babel.config.js
+19	0	client/jsconfig.json
+18304	0	client/package-lock.json
+28	0	client/package.json
+17	0	client/public/index.html
+6	0	client/src/App.vue
+124	0	client/src/components/Recognition.vue
+28	0	client/src/components/Transcriptions.vue
+6	0	client/src/main.js
+27	0	client/src/router/index.js
+23	0	client/src/store/index.js
+41	0	client/src/views/Home.vue
+15	0	client/src/views/Results.vue
+4	0	client/vue.config.js
+32	29	server/app.js
+0	90	server/bin/www
+1	839	server/package-lock.json
+4	8	server/package.json
+0	23	server/routes/index.js
+
+ae9b7ee,1645862521,Jhuangia,jialh1@uci.edu,,Server first commit
+39	0	server/app.js
+90	0	server/bin/www
+2040	0	server/package-lock.json
+17	0	server/package.json
+23	0	server/routes/index.js
+
+7abe609,1645848689,Joshua Costa,costa.joshua27@gmail.com,,Initial commit
+104	0	.gitignore
+1	0	README.md

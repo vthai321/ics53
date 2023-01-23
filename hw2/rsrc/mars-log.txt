@@ -1,0 +1,46 @@
+c09765e,1636949442,Jennifer Wong-Ma,jwongma@uci.edu,dark_mode,Fall 2021 Bombsweeper Edition
+1	1	src/main/mars/MarsSplashScreen.java
+411	0	src/main/mars/tools/ICS51_Minesweeper.java
+1	1	src/main/mars/venus/HelpAboutAction.java
+
+e74e6a4,1645672023,Jennifer Wong-Ma,jwongma@uci.edu,,Winter 2022 Wordle Edition
+5	5	gradlew
+1	1	src/main/mars/MarsSplashScreen.java
+379	379	src/main/mars/tools/ICS51_Minesweeper.java
+424	424	src/main/mars/tools/ICS51_Sudoku.java
+395	0	src/main/mars/tools/ICS51_Wordle.java
+1	1	src/main/mars/venus/HelpAboutAction.java
+
+4780299,1613965135,Jennifer Wong-Ma,jwongma@uci.edu,,ICS51 Winter 2021 Sudoku Edition
+1	1	src/main/mars/MarsSplashScreen.java
+421	421	src/main/mars/tools/ICS51_Gomoku_15.java
+421	421	src/main/mars/tools/ICS51_Gomoku_15.java
+427	0	src/main/mars/tools/ICS51_Sudoku.java
+1	1	src/main/mars/venus/HelpAboutAction.java
+
+1cadd09,1582772238,None,jennifer.wong@uci.edu,,PseudoOps.txt edited to remove all load and store instruciton with label
+7	7	src/PseudoOps.txt
+
+ca5ce1b,1609649417,Jennifer Wong-Ma,jwongma@uci.edu,,update splash screen and fixed issue with +/-0 print for 1's comp syscall
+1	1	src/main/mars/MarsLaunch.java
+1	1	src/main/mars/MarsSplashScreen.java
+9	1	src/main/mars/mips/instructions/syscalls/SyscallPrint1Complement.java
+
+369fc0c,1609541698,Jennifer Wong-Ma,jwongma@uci.edu,,Added SM and 1's comp print value syscalls (39 and 38) back
+3	1	src/Syscall.properties
+3	2	src/help/SyscallHelp.html
+1	1	src/main/mars/mips/instructions/syscalls/SyscallPrint1Complement.java
+1	1	src/main/mars/mips/instructions/syscalls/SyscallPrintSignedMagnitude.java
+
+4e806f4,1663881061,Jennifer Wong-Ma,jwongma@uci.edu,HEAD -> develop_ics51, origin/develop_ics51,Created Fall 22 version
+3	0	README.md
+1	1	src/main/mars/MarsSplashScreen.java
+363	363	src/main/mars/tools/ICS51_Wordle.java
+1	1	src/main/mars/venus/HelpAboutAction.java
+
+7e23877,1582772165,None,jennifer.wong@uci.edu,,PseudoOps.txt edited  to remove lw with label
+1	1	src/PseudoOps.txt
+
+28280af,1602611648,A. Nguyen,an3@uci.edu,,Updated Syscall help message for Service 8 to display 'is less than' rather than '<' to display properly
+1	1	src/Settings.properties
+1	1	src/help/SyscallHelp.html

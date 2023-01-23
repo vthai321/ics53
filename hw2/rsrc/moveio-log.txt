@@ -1,0 +1,284 @@
+c6a7a6a,1669531316,Shawn,shawn2000@outlook.com,HEAD -> main, origin/main, origin/HEAD,Update README.md
+1	1	README.md
+
+f7473e4,1669531299,Shawn,shawn2000@outlook.com,,Update README.md
+1	2	README.md
+
+6ce8b8f,1669531113,Shawn,shawn2000@outlook.com,,Update README.md
+3	0	README.md
+
+4c13205,1645981175,Shawn,shawn2000@outlook.com,,Update README.md
+22	2	README.md
+
+b7ead26,1645976464,sohsht,sohsht@uw.edu,,changed squat jpg
+1	1	static/move.js
+10	0	static/styles/styles.css
+
+9757f51,1645976184,Woo Young Kim,kimwy012@gmail.com,,asdffsad
+1	0	static/move.js
+10	2	static/styles/styles.css
+7	5	templates/page.html
+
+77459a3,1645974548,Woo Young Kim,kimwy012@gmail.com,,change sie
+0	4	personal.json
+7	1	static/styles/styles.css
+
+1e64eb4,1645974480,sohsht,sohsht@uw.edu,,loading
+2	2	static/move.js
+
+7704ccc,1645974270,Woo Young Kim,kimwy012@gmail.com,,saldkfjsadl
+1	1	personal.json
+5	3	static/move.js
+28	5	static/styles/styles.css
+1	6	templates/page.html
+
+e302500,1645973507,Shawn Cho,shawn2000@outlook.com,,change text
+3	8	templates/page.html
+
+0f5a6e0,1645972952,Shawn Cho,shawn2000@outlook.com,,refresh grpah
+1	1	data.json
+1	1	personal.json
+61	41	static/move.js
+
+3ad4030,1645972004,Woo Young Kim,kimwy012@gmail.com,,leaderboard done
+1	1	data.json
+1	1	personal.json
+
+40bfc61,1645971822,sohsht,sohsht@uw.edu,,merge
+2	2	static/move.js
+
+70f60e6,1645971631,Woo Young Kim,kimwy012@gmail.com,,leaderboard
+43	35	static/move.js
+66	44	static/styles/styles.css
+13	3	templates/page.html
+
+b02cf42,1645970738,sohsht,sohsht@uw.edu,,merge
+0	4	templates/page.html
+
+a09aa1d,1645970616,sohsht,sohsht@uw.edu,,merge
+6e6a232,1645970479,sohsht,sohsht@uw.edu,,fix
+1	1	app.py
+38	0	static/move.js
+11	1	templates/page.html
+
+443e22e,1645967317,Woo Young Kim,kimwy012@gmail.com,,pull
+35	35	static/move.js
+3	3	static/styles/styles.css
+5	1	templates/page.html
+
+3348564,1645967102,sohsht,sohsht@uw.edu,,made challenge instruction page
+1	1	personal.json
+31	5	static/move.js
+46	0	static/styles/styles.css
+5	13	templates/page.html
+
+7e2e9fd,1645966117,Shawn Cho,shawn2000@outlook.com,,account page done
+1	1	personal.json
+16	1	static/styles/styles.css
+7	3	templates/page.html
+
+148d98c,1645965512,Woo Young Kim,kimwy012@gmail.com,,re-size challenge
+1	1	personal.json
+20	1	static/move.js
+4	1	static/styles/styles.css
+3	31	templates/page.html
+
+efccc79,1645962820,Shawn Cho,shawn2000@outlook.com,,graph stuff
+15	0	static/styles/styles.css
+11	1	templates/page.html
+
+13e33ca,1645961082,Shawn Cho,shawn2000@outlook.com,, asdf
+0	9	templates/page.html
+
+0718aa0,1645960862,sohsht,sohsht@uw.edu,,merge error
+1	1	personal.json
+0	5	static/move.js
+0	4	templates/page.html
+
+492c2de,1645960792,Shawn Cho,shawn2000@outlook.com,,asdf
+0	4	personal.json
+0	43	static/move.js
+
+5278c68,1645960670,Woo Young Kim,kimwy012@gmail.com,,update
+1	1	personal.json
+1	0	static/move.js
+7	1	static/styles/styles.css
+2	2	templates/page.html
+
+99f010e,1645959878,sohsht,sohsht@uw.edu,,merge errors part2
+0	4	personal.json
+
+4a45d2a,1645959588,sohsht,sohsht@uw.edu,,checked for leaderboard refresh
+1	1	data.json
+1	1	personal.json
+2	0	static/move.js
+
+0290f44,1645959180,Woo Young Kim,kimwy012@gmail.com,origin/woo,added more classes;
+1	1	personal.json
+17	2	static/move.js
+2	23	templates/page.html
+
+227e519,1645958544,Shawn Cho,shawn2000@outlook.com,,setup graph on past
+1	1	app.py
+1	1	personal.json
+159	143	static/move.js
+
+0f0b889,1645956199,Woo Young Kim,kimwy012@gmail.com,,fix json error
+1	5	personal.json
+
+4b64cc7,1645956141,Woo Young Kim,kimwy012@gmail.com,origin/sushi,fix json NaN
+1	5	personal.json
+
+3476fb6,1645955972,Woo Young Kim,kimwy012@gmail.com,,fixed bugs
+1	1	personal.json
+2	0	static/move.js
+0	2	static/styles/styles.css
+0	6	templates/page.html
+
+a6fea3a,1645955613,Shawn Cho,shawn2000@outlook.com,,added graph
+1	1	personal.json
+11	0	static/graph.js
+37	5	static/move.js
+2	0	templates/page.html
+
+6134fa3,1645954264,Woo Young Kim,kimwy012@gmail.com,,classes cards
+32	8	static/move.js
+76	15	static/styles/styles.css
+27	4	templates/page.html
+
+818c720,1645953936,sohsht,sohsht@uw.edu,,constructs leaderboard
+28	4	static/move.js
+17	0	static/styles/styles.css
+1	1	templates/page.html
+
+52cab60,1645953069,Shawn Cho,shawn2000@outlook.com,,added profile endpoint
+15	1	app.py
+1	1	data.json
+1	0	personal.json
+
+b97d956,1645950740,Shawn Cho,shawn2000@outlook.com,,leaderboard stuff
+26	7	app.py
+1	0	data.json
+1	0	json_data.json
+2	2	templates/page.html
+
+45b7050,1645950736,sohsht,sohsht@uw.edu,,leaderboard mockup
+11	1	static/move.js
+
+2ef8476,1645943411,sohsht,sohsht@uw.edu,,fixed video feed update bug
+40	41	static/move.js
+8	4	templates/page.html
+
+2ea727e,1645940642,sohsht,sohsht@uw.edu,,will add the opency app to challenge page loader
+7	0	static/move.js
+
+64aa6a5,1645940512,Shawn Cho,shawn2000@outlook.com,,added stats and squat
+168	7	app.py
+
+fe3bccf,1645940274,sohsht,sohsht@uw.edu,,created yoga json
+14	1	static/move.js
+40	0	static/styles/styles.css
+1	3	templates/page.html
+
+8cac4f7,1645937263,sohsht,sohsht@uw.edu,,finished classes loading. needs formatting
+69	1	static/move.js
+1	1	static/styles/styles.css
+6	6	templates/page.html
+
+abe3e31,1645931289,sohsht,sohsht@uw.edu,,adfj
+1	1	static/move.js
+
+9722661,1645931106,Woo Young Kim,kimwy012@gmail.com,,added theme
+70	19	static/styles/styles.css
+18	4	templates/page.html
+
+
+23d9fac,1645927586,Shawn Cho,shawn2000@outlook.com,,Merge branch 'main' of github.com:ShawnCho2000/moveio into main
+5	1	app.py
+
+4990639,1645927261,sohsht,sohsht@uw.edu,,pages and nav bar js init
+18	6	static/move.js
+1	1	static/styles/styles.css
+12	3	templates/page.html
+
+24b6529,1645924896,Shawn Cho,shawn2000@outlook.com,,backend
+122	76	app.py
+1	0	templates/page.html
+
+ccca729,1645922945,sohsht,sohsht@uw.edu,,Sensei cho fixed problems for js
+7	4	static/move.js
+1	1	static/styles/styles.css
+5	5	templates/page.html
+
+8ff32ca,1645922234,sohsht,sohsht@uw.edu,,enable on screen navbar buttons through js
+11	5	static/move.js
+
+fea7003,1645920471,Woo Young Kim,kimwy012@gmail.com,,fixed navbar
+13	23	templates/page.html
+
+493bf92,1645920362,sohsht,sohsht@uw.edu,,toggle view function and sections
+4	0	static/styles/styles.css
+2	1	templates/page.html
+
+a46392a,1645920085,Woo Young Kim,kimwy012@gmail.com,,css
+21	5	static/styles/styles.css
+10	4	templates/page.html
+
+fd8e73d,1645918675,sohsht,sohsht@uw.edu,,added sections and toggle view
+10	1	static/move.js
+19	6	templates/page.html
+
+801239c,1645916992,sohsht,sohsht@uw.edu,,deleted index page
+0	22	templates/index.html
+
+31f5076,1645916638,Woo Young Kim,kimwy012@gmail.com,,add js file
+47	0	static/move.js
+
+23d6410,1645916615,sohsht,sohsht@uw.edu,,nav bar changes
+0	20	templates/index.html
+2	2	templates/page.html
+
+f8a3ea9,1645915597,Woo Young Kim,kimwy012@gmail.com,,navbar
+58	2	static/styles/styles.css
+9	12	templates/page.html
+
+cbe07f7,1645914568,Woo Young Kim,kimwy012@gmail.com,,static folder
+32	0	static/styles/styles.css
+
+470ce14,1645914378,Woo Young Kim,kimwy012@gmail.com,,add css
+32	14	templates/page.html
+0	8	templates/styles.css
+
+6a7ce14,1645913597,Shawn Cho,shawn2000@outlook.com,,asdf
+2	2	main.py => app.py
+1	1	requirements.txt
+
+2911c65,1645911743,sohsht,sohsht@uw.edu,,changed to page.html
+4	2	templates/index.html
+
+1336fd7,1645911219,Shawn Cho,shawn2000@outlook.com,,asdfsad
+72	2	main.py
+
+0ba2e4d,1645909773,Shawn Cho,shawn2000@outlook.com,,headless
+2	1	main.py
+1	1	requirements.txt
+
+cba8f2a,1645908921,Shawn Cho,shawn2000@outlook.com,,asdf
+0	0	app.py => main.py
+
+70e2dcb,1645908297,Shawn Cho,shawn2000@outlook.com,,gunicorn update
+4	0	requirements.txt
+
+15d00a7,1645907351,Shawn Cho,shawn2000@outlook.com,,taml
+31	0	app.yaml
+
+9232fa0,1645906863,sohsht,sohsht@uw.edu,,html and css starter
+20	0	templates/index.html
+8	0	templates/styles.css
+
+d0efe9f,1645906467,Shawn Cho,shawn2000@outlook.com,,init
+71	0	app.py
+15	0	templates/page.html
+
+7e0a34d,1645871297,Shawn,shawn2000@outlook.com,,Initial commit
+2	0	README.md

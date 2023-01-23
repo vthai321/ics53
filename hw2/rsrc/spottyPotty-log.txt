@@ -1,0 +1,403 @@
+757f6b6,1653206326,Catherine Zheng,zhonghezheng13579@gmail.com,,fixed buttons but not SoaB
+19	6	mapRate/static/mapRate/Map.css
+7	4	mapRate/templates/mapRate/FrontEnd.html
+
+dbd4718,1653204083,Alisa Lu,alisasl@uci.edu,,design changes
+1	1	mapRate/static/mapRate/Map.css
+
+015d4e2,1653203970,Catherine Zheng,zhonghezheng13579@gmail.com,,changed rating popup
+7	1	mapRate/static/mapRate/Map.css
+1	1	mapRate/templates/mapRate/FrontEnd.html
+
+63faa74,1653203603,Alisa Lu,alisasl@uci.edu,,reformating rating
+45	6	mapRate/static/mapRate/Map.css
+15	16	mapRate/templates/mapRate/FrontEnd.html
+
+70d2ca8,1653197788,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,fixed submit
+1	1	mapRate/models.py
+10	6	mapRate/templates/mapRate/FrontEnd.html
+15	7	mapRate/views.py
+
+fc32927,1653195656,Catherine Zheng,zhonghezheng13579@gmail.com,,added dropdown menu
+36	0	mapRate/static/mapRate/Map.css
+45	1	mapRate/templates/mapRate/FrontEnd.html
+
+b7ca4fd,1653195511,Alisa Lu,alisasl@uci.edu,,capitalized Rate and Info
+2	2	mapRate/templates/mapRate/FrontEnd.html
+
+2485a65,1653195085,Alisa Lu,alisasl@uci.edu,,changed font and layouts of popups
+18	5	mapRate/static/mapRate/Map.css
+
+2237bff,1653194288,Alisa Lu,alisasl@uci.edu,,added changes to styling
+20	19	mapRate/templates/mapRate/FrontEnd.html
+
+a5a0967,1653193992,Rose Zhang,rosewenzhang@gmail.com,,stuff
+13	0	alisa_run.sh
+7	0	reset.sh
+13	0	run.sh
+
+40e3969,1653193500,Rose Zhang,rosewenzhang@gmail.com,,added run command that says 'py' instead of 'python3'
+1	0	alisa_run.sh
+
+c2c2003,1653192946,Rose Zhang,rosewenzhang@gmail.com,,fixed spelling error
+2	2	generateBathrooms.py
+
+ae499c8,1653192758,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,made changees
+9	1	mapRate/views.py
+
+759cf1a,1653192600,Catherine Zheng,zhonghezheng13579@gmail.com,,fixed problem with merging
+7	21	mapRate/static/mapRate/Map.css
+21	26	mapRate/templates/mapRate/FrontEnd.html
+
+bd280c3,1653191133,Catherine Zheng,zhonghezheng13579@gmail.com,,finished rating
+3	1	mapRate/models.py
+5	6	mapRate/templates/mapRate/FrontEnd.html
+
+cf7d587,1653190908,Catherine Zheng,zhonghezheng13579@gmail.com,,finished rating
+17	1	mapRate/static/mapRate/Map.css
+171	54	mapRate/templates/mapRate/FrontEnd.html
+
+8f9c98c,1653188228,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,updated db
+28	13	generateBathrooms.py
+
+6ebaca1,1653186970,Alisa Lu,alisasl@uci.edu,,import
+2807611,1653186785,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,trunacte
+0	5	generateBathrooms.py
+2	1	mapRate/models.py
+
+a413c8c,1653186116,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,updated db
+1	1	generateBathrooms.py
+1	0	mapRate/models.py
+
+3ff9757,1653183462,Alisa Lu,alisasl@uci.edu,,centered buttons and stuff
+1	0	mapRate/static/mapRate/Map.css
+2	1	mapRate/templates/mapRate/FrontEnd.html
+
+d2265b1,1653183356,Rose Zhang,rosewenzhang@gmail.com,,changed default distance from 0.3 to 1
+1	1	mapRate/views.py
+
+ea9de80,1653183243,Rose Zhang,rosewenzhang@gmail.com,origin/distance,removed debug statements
+0	7	mapRate/views.py
+
+a7b5242,1653183213,Rose Zhang,rosewenzhang@gmail.com,,idk what even changed but imma commit it anyway cause what's the worst that could happen
+3	0	mapRate/views.py
+
+e5e6306,1653182716,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,added random
+28	1	generateBathrooms.py
+1	1	mapRate/models.py
+
+e84eee0,1653182674,Alisa Lu,alisasl@uci.edu,,centering buttons
+4	0	mapRate/static/mapRate/Map.css
+2	1	mapRate/templates/mapRate/FrontEnd.html
+
+a125e32,1653181868,Rose Zhang,rosewenzhang@gmail.com,,finished? distance
+3	3	mapRate/templates/mapRate/FrontEnd.html
+7	5	mapRate/views.py
+
+61eb98c,1653181804,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,added
+4	0	generateBathrooms.py
+
+08b7c62,1653181152,Alisa Lu,alisasl@uci.edu,,added minimum size
+15	6	mapRate/static/mapRate/Map.css
+18	20	mapRate/templates/mapRate/FrontEnd.html
+
+29bb726,1653181024,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,added gender neutral bathrooms
+5	4	generateBathrooms.py
+
+c9e4158,1653180703,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,moved file
+0	0	bathroomRate/generateBathrooms.py => generateBathrooms.py
+
+27b7ff8,1653180133,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,added locations
+56	0	bathroomRate/generateBathrooms.py
+
+ac1ea71,1653179567,Rose Zhang,rosewenzhang@gmail.com,,stuff
+2	3	mapRate/templates/mapRate/FrontEnd.html
+2	2	mapRate/views.py
+
+30b5bdc,1653178433,Rose Zhang,rosewenzhang@gmail.com,,started distance but forms are weird
+14	2	mapRate/views.py
+
+b837a75,1653178368,Catherine Zheng,zhonghezheng13579@gmail.com,,merging to main
+19	7	mapRate/templates/mapRate/FrontEnd.html
+
+1ba1062,1653177862,Alisa Lu,alisasl@uci.edu,,idk
+1	1	mapRate/static/mapRate/Map.css
+1	1	mapRate/templates/mapRate/FrontEnd.html
+
+1920074,1653177836,Catherine Zheng,zhonghezheng13579@gmail.com,,fixed boxes
+5	5	mapRate/templates/mapRate/FrontEnd.html
+
+4685cc8,1653177180,Catherine Zheng,zhonghezheng13579@gmail.com,,fixed problem
+4	6	mapRate/templates/mapRate/FrontEnd.html
+
+1953445,1653177114,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,merged
+0	13	mapRate/templates/mapRate/FrontEnd.html
+
+21c3b8f,1653176919,Rose Zhang,rosewenzhang@gmail.com,,preserve form fields
+36	7	mapRate/templates/mapRate/FrontEnd.html
+19	2	mapRate/views.py
+
+bab26d5,1653176685,Catherine Zheng,zhonghezheng13579@gmail.com,,made line height taller
+6	0	mapRate/static/mapRate/Map.css
+3	1	mapRate/templates/mapRate/FrontEnd.html
+
+5ff1401,1653176649,Alisa Lu,alisasl@uci.edu,,rate menu initialization
+54	4	mapRate/templates/mapRate/FrontEnd.html
+
+70b102c,1653175688,Alisa Lu,alisasl@uci.edu,,style
+1	1	mapRate/static/mapRate/Map.css
+
+962637d,1653175657,Alisa Lu,alisasl@uci.edu,,rating system
+5	1	mapRate/templates/mapRate/FrontEnd.html
+4	2	mapRate/views.py
+
+84bfdef,1653175260,Alisa Lu,alisasl@uci.edu,,working on rating button
+20	3	mapRate/static/mapRate/Map.css
+15	1	mapRate/templates/mapRate/FrontEnd.html
+
+e020d9e,1653175024,Catherine Zheng,zhonghezheng13579@gmail.com,,did something
+1	0	mapRate/templates/mapRate/FrontEnd.html
+
+e7adce0,1653174975,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,fixed more menu
+3	3	mapRate/templates/mapRate/FrontEnd.html
+
+7cd4291,1653174692,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,origin/more,finished more menu
+1	1	mapRate/static/mapRate/Map.css
+62	6	mapRate/templates/mapRate/FrontEnd.html
+
+ec3af5d,1653174107,Catherine Zheng,zhonghezheng13579@gmail.com,,added location tracking
+31	1	mapRate/templates/mapRate/FrontEnd.html
+
+2848c71,1653171887,Alisa Lu,alisasl@uci.edu,,changed hover message
+1	1	mapRate/templates/mapRate/FrontEnd.html
+
+752a967,1653171789,Alisa Lu,alisasl@uci.edu,,changed button
+5	7	mapRate/static/mapRate/Map.css
+
+a50d822,1653171615,Alisa Lu,alisasl@uci.edu,,"changed pin click popup"
+16	8	mapRate/templates/mapRate/FrontEnd.html
+
+6ea7a4c,1653171422,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,buttons dont appear if no gender
+10	4	mapRate/templates/mapRate/FrontEnd.html
+
+f7725c9,1653171008,Catherine Zheng,zhonghezheng13579@gmail.com,,changed boxes and fixed hygene
+3	0	mapRate/static/mapRate/Map.css
+9	8	mapRate/templates/mapRate/FrontEnd.html
+
+75277b2,1653171005,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,added big menu stuff
+3	1	mapRate/models.py
+8	11	mapRate/templates/mapRate/FrontEnd.html
+
+62baf56,1653170882,Alisa Lu,alisasl@uci.edu,,changed styling of popup
+5	2	mapRate/static/mapRate/Map.css
+7	6	mapRate/templates/mapRate/FrontEnd.html
+
+e8ddb7f,1653169299,Alisa Lu,alisasl@uci.edu,,adapted pin information
+13	6	mapRate/templates/mapRate/FrontEnd.html
+
+dfb1c15,1653168836,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,fixed popup
+16	27	mapRate/static/mapRate/Map.css
+7	6	mapRate/templates/mapRate/FrontEnd.html
+
+6b9b48b,1653168299,Catherine Zheng,zhonghezheng13579@gmail.com,,update to main
+1	1	mapRate/static/mapRate/Map.css
+
+a931627,1653168200,Alisa Lu,alisasl@uci.edu,,adjusted minimum zoom size
+1	1	mapRate/templates/mapRate/FrontEnd.html
+
+a258803,1653164457,Catherine Zheng,zhonghezheng13579@gmail.com,,changed color and boarder
+14	1	mapRate/static/mapRate/Map.css
+6	7	mapRate/templates/mapRate/FrontEnd.html
+
+0e0839a,1653164393,Alisa Lu,alisasl@uci.edu,,more styling
+21	10	mapRate/static/mapRate/Map.css
+2	2	mapRate/templates/mapRate/FrontEnd.html
+
+d0236bd,1653164226,Rose Zhang,rosewenzhang@gmail.com,origin/filter,fixed boolean logic with paid and free
+11	2	mapRate/views.py
+
+118f385,1653163395,Rose Zhang,rosewenzhang@gmail.com,,made reset bash script
+4	0	reset.sh
+
+dfb7cf8,1653163312,Nathan Ng,nathan@dhcp-v007-229.mobile.uci.edu,,fixed filters
+1	0	mapRate/models.py
+14	12	mapRate/views.py
+
+356fa19,1653163032,Alisa Lu,alisasl@uci.edu,,adjusted styles
+5	4	mapRate/static/mapRate/Map.css
+0	1	mapRate/templates/mapRate/FrontEnd.html
+
+9cd8b3e,1653162996,Catherine Zheng,zhonghezheng13579@gmail.com,,added color palets
+13	0	mapRate/static/mapRate/Map.css
+7	5	mapRate/templates/mapRate/FrontEnd.html
+
+510a333,1653161968,Rose Zhang,rosewenzhang@gmail.com,,finished filter
+4	4	mapRate/models.py
+18	27	mapRate/views.py
+
+edfbfb0,1653161450,Alisa Lu,alisasl@uci.edu,,changed design of popup
+6	2	mapRate/static/mapRate/Map.css
+
+b08a290,1653161406,Catherine Zheng,zhonghezheng13579@gmail.com,,added tickmarks
+23	2	mapRate/templates/mapRate/FrontEnd.html
+
+e458eae,1653160739,Rose Zhang,rosewenzhang@gmail.com,,started working on filter but discovered that catherine fucked up merging to main like an idiot
+1	1	mapRate/templates/mapRate/FrontEnd.html
+32	2	mapRate/views.py
+
+59fb40e,1653160525,Alisa Lu,alisasl@uci.edu,,popup works now
+9	8	mapRate/static/mapRate/Map.css
+24	17	mapRate/templates/mapRate/FrontEnd.html
+
+fd627f8,1653158733,Nathan Ng,nathan@dhcp-v007-229.mobile.uci.edu,,fixed form
+13	2	mapRate/templates/mapRate/FrontEnd.html
+20	17	mapRate/views.py
+
+3c5f4ba,1653156286,Alisa Lu,alisasl@uci.edu,,attempted ot add outer div
+9	1	mapRate/static/mapRate/Map.css
+6	5	mapRate/templates/mapRate/FrontEnd.html
+
+0b58fd2,1653156129,Nathan Ng,nathan@dhcp-v019-203.mobile.uci.edu,origin/BackEnd,more db changes
+4	11	mapRate/models.py
+
+ad81d55,1653156041,Catherine Zheng,zhonghezheng13579@gmail.com,,added forms and chaged rating to slider
+10	0	mapRate/static/mapRate/Map.css
+24	18	mapRate/templates/mapRate/FrontEnd.html
+
+a79e997,1653155761,Nathan Ng,nathan@dhcp-v019-203.mobile.uci.edu,,updated db
+2	1	mapRate/models.py
+20	17	mapRate/views.py
+4	0	reset.sh
+
+b19f108,1653154923,Rose Zhang,rosewenzhang@gmail.com,,new branch for backend
+2	2	mapRate/models.py
+
+42c0dc4,1653126237,Alisa Lu,alisasl@uci.edu,,changed close on popup
+2	2	mapRate/static/mapRate/Map.css
+2	3	mapRate/templates/mapRate/FrontEnd.html
+
+8b1f8c5,1653125497,Catherine Zheng,zhonghezheng13579@gmail.com,,did popup
+34	19	mapRate/static/mapRate/Map.css
+20	20	mapRate/templates/mapRate/FrontEnd.html
+
+2843e15,1653123806,Catherine Zheng,zhonghezheng13579@gmail.com,,added button
+16	0	mapRate/templates/mapRate/FrontEnd.html
+
+8acf7ce,1653123771,Alisa Lu,alisasl@uci.edu,,tinkering with popup
+4	3	mapRate/static/mapRate/Map.css
+23	12	mapRate/templates/mapRate/FrontEnd.html
+
+9922bb0,1653120267,Catherine Zheng,zhonghezheng13579@gmail.com,,hygiene now spelled correctly :)
+5	5	mapRate/templates/mapRate/FrontEnd.html
+
+00e1cf3,1653120009,Catherine Zheng,zhonghezheng13579@gmail.com,,did something
+0	10	mapRate/templates/mapRate/FrontEnd.html
+
+7cd77b0,1653119567,Rose Zhang,rosewenzhang@gmail.com,,added todo about period products'
+1	0	mapRate/models.py
+
+29453de,1653119330,Nathan Ng,nathan@dhcp-v019-203.mobile.uci.edu,,changed pins database
+4	2	mapRate/models.py
+
+412a8ea,1653117943,Nathan Ng,nathan@dhcp-v019-203.mobile.uci.edu,origin/pins,fixed pin stuff
+1	1	mapRate/models.py
+
+a4bf0b9,1653117809,Alisa Lu,alisasl@uci.edu,,added popup
+3	2	mapRate/admin.py
+12	13	mapRate/models.py
+2	2	mapRate/templates/mapRate/FrontEnd.html
+2	2	mapRate/views.py
+
+c94cc7b,1653117544,Alisa Lu,alisasl@uci.edu,,added popup menu for pins
+21	0	mapRate/static/mapRate/Map.css
+29	8	mapRate/templates/mapRate/FrontEnd.html
+
+b28edb4,1653117471,Catherine Zheng,zhonghezheng13579@gmail.com,,added more filter options
+13	2	mapRate/static/mapRate/Map.css
+45	9	mapRate/templates/mapRate/FrontEnd.html
+
+c5c10ca,1653117025,Rose Zhang,rosewenzhang@gmail.com,,pushing *critical* patch
+1	1	mapRate/views.py
+
+8e5cd45,1653116535,Nathan Ng,nathan@dhcp-v019-203.mobile.uci.edu,origin/origin/model_refactoring,fixed db
+2	1	mapRate/admin.py
+6	5	mapRate/models.py
+1	1	mapRate/templates/mapRate/main.html
+
+b5e42e0,1653115360,Rose Zhang,rosewenzhang@gmail.com,origin/model_refactoring,started model refactoring (this doesn't compile)
+46	18	mapRate/models.py
+1	1	mapRate/templates/mapRate/main.html
+9	10	mapRate/views.py
+
+7c5daca,1653114752,Catherine Zheng,zhonghezheng13579@gmail.com,,map floated right
+1	0	mapRate/static/mapRate/Map.css
+
+d1c2582,1653114442,Catherine Zheng,zhonghezheng13579@gmail.com,,added filter
+8	1	mapRate/static/mapRate/Map.css
+38	13	mapRate/templates/mapRate/FrontEnd.html
+
+abd5073,1653114002,Alisa Lu,alisasl@uci.edu,,added pins
+10	2	mapRate/templates/mapRate/FrontEnd.html
+
+c6cd2fc,1653113889,Nathan Ng,nathan@dhcp-v019-203.mobile.uci.edu,,form small
+4	0	mapRate/templates/mapRate/form.html
+
+ef2276e,1653112861,Rose Zhang,rosewenzhang@gmail.com,,added run command yay
+1	0	run.sh
+
+15d7ca3,1653112697,Nathan Ng,nathan@dhcp-v019-203.mobile.uci.edu,,Added bathrooms to database
+1	1	mapRate/models.py
+0	0	mapRate/templates/mapRate/form.html
+
+a779280,1653112432,Alisa Lu,alisasl@uci.edu,,adjusted zoom levels for map
+3	2	mapRate/templates/mapRate/FrontEnd.html
+
+3ff9d34,1653111967,Rose Zhang,rosewenzhang@gmail.com,,updated gitignore again
+1	2	.gitignore
+
+af75258,1653111765,Catherine Zheng,zhonghezheng13579@gmail.com,,fixed map
+8	10	mapRate/templates/mapRate/FrontEnd.html
+
+8c6ef21,1653111713,Rose Zhang,rosewenzhang@gmail.com,,added .gitignore to ignore caches
+3	0	.gitignore
+
+aafc4af,1653111140,Nathan Ng,nathan@dhcp-v019-203.mobile.uci.edu,,added .html
+0	0	mapRate/templates/mapRate/{FrontEnd => FrontEnd.html}
+
+2d76761,1653111044,Catherine Zheng,zhonghezheng13579@gmail.com,,added stuff
+0	0	Map.css => mapRate/static/mapRate/Map.css
+3	1	FrontEnd => mapRate/templates/mapRate/FrontEnd
+1	1	mapRate/views.py
+
+4fd90fe,1653110593,Nathan Ng,nathan@dhcp-v019-203.mobile.uci.edu,,Added rating backend
+15	6	mapRate/models.py
+18	11	mapRate/views.py
+
+435d4f0,1653110444,Catherine Zheng,zhonghezheng13579@gmail.com,,working map :)
+31	0	FrontEnd
+5	0	Map.css
+
+cf95e5d,1653109797,Nathan Ng,nathan@dhcp-v019-203.mobile.uci.edu,,updated database
+12	8	mapRate/models.py
+7	12	mapRate/views.py
+
+d4474fd,1653108830,Nathan Ng,nathan@dhcp-v019-203.mobile.uci.edu,,Added admin
+4	0	mapRate/admin.py
+
+9c43e8a,1653108536,Nathan Ng,nathan@dhcp-v019-203.mobile.uci.edu,,First commit
+0	0	bathroomRate/__init__.py
+16	0	bathroomRate/asgi.py
+124	0	bathroomRate/settings.py
+22	0	bathroomRate/urls.py
+16	0	bathroomRate/wsgi.py
+22	0	manage.py
+0	0	mapRate/__init__.py
+3	0	mapRate/admin.py
+6	0	mapRate/apps.py
+16	0	mapRate/models.py
+17	0	mapRate/static/mapRate/menu.js
+0	0	mapRate/static/mapRate/styles.css
+44	0	mapRate/templates/mapRate/main.html
+3	0	mapRate/tests.py
+6	0	mapRate/urls.py
+28	0	mapRate/views.py
