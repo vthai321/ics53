@@ -8,7 +8,12 @@
 // Part 0 Function to implement
 char* myStrCpy(char* str, char* delimiters) 
 {
-    char * newStr = (char *) malloc(sizeof(str));
+    char* newStr = (char *) malloc(myStrSize(str));
+    if(newStr == NULL)
+    {
+        return "fail"; // not necessary?
+    }
+    
     char currentChar = ' ';
 
     if(newStr == NULL || str == NULL)
@@ -19,13 +24,13 @@ char* myStrCpy(char* str, char* delimiters)
     int parseString = 1; // becomes 0 if we reach null terminator or deliminator
     int offset = 0; // offset for pointer arithmetic
     int inDelimit = 0; // becomes 1 if our char is part of our delimit string
-    size_t delimitBound = sizeof(delimiters) - 1;
+    int delimitBound = myStrSize(delimiters) - 1; // -1 accounts for null terminator
     
     while(parseString)
     {
         
         currentChar = *(str + offset);
-        for(size_t i = 0; i < delimitBound; ++i)
+        for(int i = 0; i < delimitBound; ++i)
         {
             if(currentChar == *(delimiters + i))
             {
@@ -114,15 +119,41 @@ int ModFileTotal_Comparator(const void* file1, const void* file2)
 }
 
 // Part 2 Functions to implement
-void ModFile_Printer(void* data, void* fp, int flag) {
+void ModFile_Printer(void* data, void* fp, int flag) 
+{
+    // print to fp
+    int theDeletes = ((ModFile*)data)->deletes;
+    int theInserts = ((ModFile*)data)->inserts;
+    char* theFilename = ((ModFile*)data)->filename;
+
+    fprintf( (FILE*)fp, "Total Inserts:%d\tTotal Deletes:%d\t%s\n", theInserts, theDeletes, theFilename);
 
 }
 
-void ModFile_Deleter(void* data) {
-
+void ModFile_Deleter(void* data) 
+{
+    // free the dynamically allocated filename string 
+    if(data != NULL)
+    {
+        free( ((ModFile*)data)->filename );
+    }
 }
 
-node_t* FindInList(list_t* list, void* token)  {
+node_t* FindInList(list_t* list, void* token)  
+{
+    // search list using specifications provided by token's type and search value to provide to comparator
+    // return pointer to matching node
+    // note use of _t for template (will use for your code too)
+
+    node_t* current = list->head;
+    while(current != NULL)
+    {
+        
+        
+        current = current->next;
+    }
+
+    
     return NULL;
 }
 
@@ -136,7 +167,8 @@ void ProcessModFile(FILE* fp, list_t* list, char ordering) {
 
 
 // Part 3 Functions to implement
-void AuthorPrinter(void* data, void *fp, int flag) {
+void AuthorPrinter(void* data, void *fp, int flag) 
+{
 
 }
 

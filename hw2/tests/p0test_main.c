@@ -30,5 +30,6 @@ int main(void) {
     if(strcmp(delims, delims2) != 0) //string.h functions are not allowed in your assignment!!!
         printf("OOPS!!! delims2 was modified - Don't do that!\n");
 
+    printf("Reached end of p0 main");
     return 0;
 }

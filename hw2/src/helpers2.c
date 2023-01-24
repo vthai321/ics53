@@ -33,3 +33,25 @@ int myStrcmp(char* string1, char* string2)
     while(currentString1 != '\0' || currentString2 != '\0');
     return comparisonStatus;
 }
+
+/*
+    My own implementation of strlen()
+*/
+int myStrSize(const char* str)
+{
+    int counter = 0;
+    char currentChar = *str;
+    int offset = 0;
+    while(1)
+    {
+        currentChar = *(str + offset);
+        ++counter;
+        ++offset; 
+        if(currentChar == '\0')
+        {
+            break;
+        }
+
+    }
+    return counter;
+}

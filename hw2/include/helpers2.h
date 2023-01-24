@@ -9,5 +9,10 @@
 */
 int myStrcmp(char* string1, char* string2);
 
+/*
+    Counts size (including null)
+*/
+int myStrSize(const char* str);
+
 
 #endif
