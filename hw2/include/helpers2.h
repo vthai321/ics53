@@ -10,7 +10,8 @@
 int myStrcmp(char* string1, char* string2);
 
 /*
-    Counts size (including null)
+    Counts size (including null terminator)
+    
 */
 int myStrSize(const char* str);
 

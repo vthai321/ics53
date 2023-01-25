@@ -12,7 +12,7 @@ int main(void) {
     char* sampleStr = "Who?\n What!? Why???";   //reference to static string
     char* delims = "?\n";                       //reference to static string
     
-    char* result = myStrCpy(sampleStr, delims);
+    char* result = myStrCpy(sampleStr, NULL); // changed from delims to NULL
 
     printf("sampleStr: %s\nresult: %s, result address: %p\n\n", sampleStr, result, result);   
 

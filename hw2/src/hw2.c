@@ -8,23 +8,33 @@
 // Part 0 Function to implement
 char* myStrCpy(char* str, char* delimiters) 
 {
-    char* newStr = (char *) malloc(myStrSize(str));
-    if(newStr == NULL)
+
+    if(str == NULL)
     {
-        return "fail"; // not necessary?
+        return NULL; // parameter check
     }
     
+    char* newStr = (char *) malloc(myStrSize(str));    
     char currentChar = ' ';
 
-    if(newStr == NULL || str == NULL)
+    if(newStr == NULL)
     {
-        return NULL;
+        return NULL; // malloc check
     }
 
     int parseString = 1; // becomes 0 if we reach null terminator or deliminator
     int offset = 0; // offset for pointer arithmetic
     int inDelimit = 0; // becomes 1 if our char is part of our delimit string
-    int delimitBound = myStrSize(delimiters) - 1; // -1 accounts for null terminator
+    
+    int delimitBound = 0;
+    if(delimiters != NULL)
+    {
+        delimitBound = myStrSize(delimiters) - 1; // - 1 accounts for null terminator
+    }
+    else
+    {
+        delimitBound = -1;
+    }
     
     while(parseString)
     {
@@ -66,7 +76,10 @@ ModFile* PutModFile(int ins, int dels, char* filename, ModFile* mf)
         ModFile* newModFile = (ModFile*) malloc(sizeof(ModFile));
         newModFile->inserts = ins;
         newModFile->deletes = dels;
-        newModFile->filename = filename;
+        
+        //copy string into struct?
+        newModFile ->filename = myStrCpy(filename, '\0');
+        //newModFile->filename = *filename;
         return newModFile;
     }
     else
@@ -80,8 +93,8 @@ ModFile* PutModFile(int ins, int dels, char* filename, ModFile* mf)
         else
         {
             // filename matches ModFile's filename
-            mf->inserts = ins;
-            mf->deletes = dels;
+            mf->inserts += ins;
+            mf->deletes += dels;
             ModFile* validReturn = mf;
             return validReturn;
         }
@@ -100,7 +113,7 @@ int ModFileTotal_Comparator(const void* file1, const void* file2)
 {
     // compare number of ins/del between the two ModFiles
     // 0 if ins + del equal, -1 if file1 < file2, 1 if file1 > file2
-    int file1Sum = ((ModFile*)file1)->inserts + ((ModFile*)file2)->deletes;
+    int file1Sum = ((ModFile*)file1)->inserts + ((ModFile*)file1)->deletes;
     int file2Sum = ((ModFile*)file2)->inserts + ((ModFile*)file2)->deletes;
 
     if(file1Sum == file2Sum)
@@ -111,7 +124,7 @@ int ModFileTotal_Comparator(const void* file1, const void* file2)
     {
         return 1;
     }
-    else
+    else if(file1Sum < file2Sum)
     {
         return -1;
     }
