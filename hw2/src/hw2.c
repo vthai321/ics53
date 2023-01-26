@@ -308,8 +308,7 @@ int AuthorCommitComparator(const void* lhs, const void* rhs)
     int lhsCommitCount = theLhs->commitCount;
     int rhsCommitCount = theRhs->commitCount;
 
-    if(theLhs->email == NULL || theRhs->email == NULL || ( myStrcmp(theLhs->email, theRhs->email) == 0 
-        && lhsCommitCount == rhsCommitCount) );
+    if(AuthorEmailComparator(lhs, rhs) == 0 && lhsCommitCount == rhsCommitCount)
     {
         return 0;
     }
@@ -326,6 +325,7 @@ int AuthorCommitComparator(const void* lhs, const void* rhs)
     else
     {
         return AuthorEmailComparator(lhs, rhs);
+        printf("banana\n");
     }
 
 
