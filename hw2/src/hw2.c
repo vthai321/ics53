@@ -146,9 +146,14 @@ void ModFile_Printer(void* data, void* fp, int flag)
 void ModFile_Deleter(void* data) 
 {
     // free the dynamically allocated filename string 
+    // free the ModFile too?
     if(data != NULL)
     {
-        free( ((ModFile*)data)->filename );
+        if(((ModFile*)data)->filename != NULL)
+        {
+            free( ((ModFile*)data)->filename );
+            //free(data);
+        }
     }
 }
 
@@ -156,25 +161,61 @@ node_t* FindInList(list_t* list, void* token)
 {
     // search list using specifications provided by token's type and search value to provide to comparator
     // return pointer to matching node
-    // note use of _t for template (will use for your code too)
+    // note use of _t for template (will use for your code too) <-- just cast to appropriate data type (ModFile) if needed
+    // find which comparator to use using the list struct datatype
+    // invoke the function using the function pointer
+
+    if(token == NULL)
+    {
+        return NULL; //empty token
+    }
+
 
     node_t* current = list->head;
     while(current != NULL)
     {
-        
-        
+        if(list->comparator(current->data, token) == 0) // it works, but please ask how it works, I DON'T GET ITTTTT
+        {
+            return current;
+        }
         current = current->next;
     }
 
     
-    return NULL;
+    return NULL; // not found 
 }
 
-void DestroyList(list_t** list) {
-
+void DestroyList(list_t** list) // pointer to a pointer, so that we can free the pointer the pointer points to  
+{
+    // please look at doc carefully
+    if(list != NULL) // exit if we have no list
+    {
+        if((*list)->head == NULL)
+        {
+            // just need to delete and free the list pointer
+            free(*list);
+            // do we need free(list)? (without the *)
+        }
+        else
+        {
+            node_t* current = (*list)->head;
+            node_t* nextNode = NULL;
+            while(current != NULL)
+            {
+                nextNode = current->next;
+                (*list)->deleter(current->data); // deleter deletes the data within the ModFIle within the node.
+                free(current->data); // deletes the ModFule
+                free(current); // free the node 
+                current = nextNode;
+            }
+            free(*list);
+            nextNode = NULL;        
+        }
+    }
 }
 
-void ProcessModFile(FILE* fp, list_t* list, char ordering) {
+void ProcessModFile(FILE* fp, list_t* list, char ordering) 
+{
 
 }
 
@@ -182,23 +223,125 @@ void ProcessModFile(FILE* fp, list_t* list, char ordering) {
 // Part 3 Functions to implement
 void AuthorPrinter(void* data, void *fp, int flag) 
 {
+    if(data != NULL)
+    {
+        char* authorName = ((Author*)data)->fullname;
+        char* email = ((Author*)data)->email;
+        int commitCount = ((Author*)data)->commitCount;
+
+        if(authorName == NULL || email == NULL)
+        {
+            return; // oops, our authorName or email strings are null
+        }
+
+        if(flag == 0)
+        {   
+            if( ((Author*)data)->modFileList == NULL)
+            {
+                return; // gotta check if node has ModFile
+            }
+            
+            int modFileListLen = ((Author*)data)->modFileList->length;
+            fprintf((FILE*)fp, "%s <%s>,%d,%d\n", authorName, email, commitCount, modFileListLen);
+        }
+        else
+        {
+            fprintf((FILE*)fp, "%s <%s>,%d\n", authorName, email, commitCount);
+            // use modFilePrinter
+            node_t* current = NULL;
+            if(((Author*)data)->modFileList == NULL)
+            {
+                return; // oops, this node does not have a ModFile
+            }
+            else
+            {
+                current = ((Author*)data)->modFileList->head;
+            }
+            while(current != NULL)
+            {
+                if(current->data == NULL)
+                {
+                    return; // oops, this node does not have a ModFile
+                }
+                
+                fprintf((FILE*)fp, "\t");
+                ModFile_Printer(current->data, fp, 0);
+                current = current->next;
+            }
+        }
+    }
+}
+
+int AuthorEmailComparator(const void* lhs, const void* rhs)  
+{
+    // cast the void pointers
+    // use myStrcmp
+    if(lhs == NULL || rhs == NULL)
+    {
+        return 0;
+    }
+
+    Author* theLhs = (Author*)lhs;   
+    Author* theRhs = (Author*)rhs;
+
+    if(theLhs->email == NULL || theRhs->email == NULL)
+    {
+        return 0;
+    }
+
+    return myStrcmp(theLhs->email, theRhs->email);  
+}
+
+int AuthorCommitComparator(const void* lhs, const void* rhs) 
+{
+    if(lhs == NULL || rhs == NULL)
+    {
+        return 0;
+    }
+    
+    Author* theLhs = (Author*)lhs;   
+    Author* theRhs = (Author*)rhs;
+
+    // if count is equal, sort alphabetically via email
+    // if email and commitCounts are identical or either is NULL, return 0
+    
+    int lhsCommitCount = theLhs->commitCount;
+    int rhsCommitCount = theRhs->commitCount;
+
+    if(theLhs->email == NULL || theRhs->email == NULL || ( myStrcmp(theLhs->email, theRhs->email) == 0 
+        && lhsCommitCount == rhsCommitCount) );
+    {
+        return 0;
+    }
+
+    //use author email comparator if we are TIED
+    if(lhsCommitCount > rhsCommitCount)
+    {
+        return -1;
+    }
+    else if(lhsCommitCount < rhsCommitCount)
+    {
+        return 1;
+    }
+    else
+    {
+        return AuthorEmailComparator(lhs, rhs);
+    }
+
 
 }
 
-int AuthorEmailComparator(const void* lhs, const void* rhs)  {
-    return -999;
+void AuthorDeleter(void* data)  
+{
+    //if(data != NULL)
+    //{
+    //    ModFile_Deleter(data->modFileList);
+    //}
 }
 
-int AuthorCommitComparator(const void* lhs, const void* rhs) {
-    return -999;
-}
-
-void AuthorDeleter(void* data)  {
-
-}
-
-Author* CreateAuthor(char* line, long int *timestamp)  {
-    return NULL;
+Author* CreateAuthor(char* line, long int *timestamp)  
+{
+    
 }
 
 

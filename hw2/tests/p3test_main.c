@@ -8,7 +8,8 @@ int main() {
     char* name1 = "Jennifer Wong-Ma";  	       // Static string
     char  name2[] = "Michael Schindler"; 	   // Array without size, edittable
     char  email1[20] = "jwongma@uci.edu";      // Array with size, uninitialized bytes set to 0 
-    char  email2[5] = "mikes@uci.edu";         // Array with size, truncated initialization (no null terminator!) DON'T USE THIS AS A STRING!!!
+    //char  email2[5] = "mikes@uci.edu";         // Array with size, truncated initialization (no null terminator!) DON'T USE THIS AS A STRING!!!
+    char email2[20] = "mikes@uci.edu"; // This time it has a null teminator
 
     char* email3 = calloc(5,1);     // 5 bytes of space initialized to 0
     strncpy(email3,email2,4);         // String.h functions are not allowed in your HW implemention!! Create your own versions with pointers
