@@ -174,7 +174,7 @@ node_t* FindInList(list_t* list, void* token)
     node_t* current = list->head;
     while(current != NULL)
     {
-        if(list->comparator(current->data, token) == 0) // it works, but please ask how it works, I DON'T GET ITTTTT
+        if(list->comparator(current->data, token) == 0) 
         {
             return current;
         }
@@ -216,6 +216,71 @@ void DestroyList(list_t** list) // pointer to a pointer, so that we can free the
 
 void ProcessModFile(FILE* fp, list_t* list, char ordering) 
 {
+    // read lines from fp; end when the line from fp is empty (null terminator only?)
+    // use FindInList, putModFile, and linked list functions to update linked list
+
+    // use the ModFileABC_Comparator to sort the ModFiles
+    // ordering argument: filename alphabetically (insertInOrder), or first order of appearance in file (InsertAtTale)
+    // ^ use ordering parameter for this
+    // if list is null, do nothing
+
+    // a modFile needs inserts, deletes, fileName
+    // the testcases skip the actual commit line, I think. Just worry about the insert, delete, filename part
+
+    if(list == NULL)
+    {
+        return;
+    }
+
+    list->comparator = ModFileABC_Comparator; // probably unnecessary, but whatever
+
+    int* theInserts = malloc(sizeof(int));
+    int* theDels = malloc(sizeof(int));
+    char* theFilename = malloc(205);
+
+    int scanResult = fscanf(fp, "Total Inserts:%d\tTotal Deletes:%d\t%s\n", theInserts, theDels, theFilename);
+    
+    while(scanResult > 0 && scanResult != EOF) 
+    {
+        ModFile* newModFile = malloc(sizeof(ModFile));
+        newModFile = PutModFile(*theInserts, *theDels, myStrCpy(theFilename, NULL), NULL);
+        node_t* posInList = FindInList(list, newModFile);
+        // use findInList to prevent duplicates?
+        // update if found
+        if(ordering == 'a'&& posInList == NULL)
+        {
+            InsertInOrder(list, newModFile); 
+        }
+        else if(ordering == 'f'&& posInList == NULL)
+        {
+            InsertAtTail(list, newModFile);
+        }
+        else if(ordering == 'a' && posInList != NULL)
+        {
+            // update ins and dels using putModFile and delete the newModFile
+            PutModFile(*theInserts, *theDels, myStrCpy(theFilename,NULL), posInList->data);
+            ModFile_Deleter(newModFile);
+            free(newModFile);
+            newModFile = NULL;
+
+        }
+        else if(ordering == 'f' && posInList != NULL)
+        {
+            // update ins and dels
+            PutModFile(*theInserts, *theDels, myStrCpy(theFilename,NULL), posInList->data);
+            ModFile_Deleter(newModFile);
+            free(newModFile);
+            newModFile = NULL;
+        }
+
+        scanResult = fscanf(fp, "Total Inserts:%d\tTotal Deletes:%d\t%s\n", theInserts, theDels, theFilename);
+    }
+    free(theFilename);
+    free(theInserts);
+    free(theDels);
+    theInserts = NULL;
+    theDels = NULL;
+    theFilename = NULL;
 
 }
 
@@ -308,7 +373,7 @@ int AuthorCommitComparator(const void* lhs, const void* rhs)
     int lhsCommitCount = theLhs->commitCount;
     int rhsCommitCount = theRhs->commitCount;
 
-    if(AuthorEmailComparator(lhs, rhs) == 0 && lhsCommitCount == rhsCommitCount)
+    if(lhsCommitCount == rhsCommitCount && AuthorEmailComparator(lhs, rhs) == 0) // short circuiting 
     {
         return 0;
     }
@@ -325,7 +390,7 @@ int AuthorCommitComparator(const void* lhs, const void* rhs)
     else
     {
         return AuthorEmailComparator(lhs, rhs);
-        printf("banana\n");
+
     }
 
 
@@ -333,19 +398,103 @@ int AuthorCommitComparator(const void* lhs, const void* rhs)
 
 void AuthorDeleter(void* data)  
 {
-    //if(data != NULL)
-    //{
-    //    ModFile_Deleter(data->modFileList);
-    //}
+    // Author contains: char* fullname, char* email, list_t* modFileList to free 
+    // call destroyList on modFileList, manually free fullname, email
+    // ther eis possible seg fault here
+
+    Author* authorPointer = (Author*)data;
+    list_t** listPointer = &(authorPointer->modFileList);
+
+    // time to free
+    free(authorPointer->fullname);
+    free(authorPointer->email);
+    authorPointer->fullname = NULL;
+    authorPointer->email = NULL;
+    DestroyList(listPointer); // frees the nodes as well as the list itself.
+    listPointer = NULL; 
 }
 
 Author* CreateAuthor(char* line, long int *timestamp)  
 {
+    // line is provided, we will separate elements into relevant information
+    // use strCpy with the delimiter feature (comma separated) or fgets()
+    // use pointers to track which parts of line we've already gone over? (with myStrSize?)
+    // commitHash, timestamp, fullname, email, message
+    if(line == NULL)
+    {
+        return NULL; // line was null
+    }
     
+    char* linePos = line;
+
+    // we'll store commitHash anyways just to see if its empty or not
+    char* commitHash = myStrCpy(linePos, ",");
+    if(myStrcmp(commitHash, "\0") == 0)
+    {
+        return NULL; //empty commit field
+    }
+    linePos += (myStrSize(commitHash));
+
+    char* theTimestamp = myStrCpy(linePos,",");
+    long int timestampNum = strtol(theTimestamp, NULL, 10); // passing null means I will increment it manually
+        if(timestampNum < 0)
+    {
+        return NULL; // negative timestamp value is invalid
+    }
+    
+    linePos += (myStrSize(theTimestamp)); 
+    *timestamp = timestampNum;
+
+    char* fullname = myStrCpy(linePos, ","); // copy starting at where we point in the string
+    linePos += (myStrSize(fullname));// increment pointer by size of string 
+
+    char* email = myStrCpy(linePos, ",");
+    linePos += (myStrSize(email));
+
+    if(myStrcmp(fullname, "\0") == 0 || myStrcmp(email, "\0") == 0)
+    {
+        return NULL; // empty name or email field
+    }
+
+    // time to build the author (dynamically allocated)
+    Author* newAuthor = malloc(sizeof(Author));
+    newAuthor->fullname = myStrCpy(fullname, "\0"); // we need to make a completely separate copy, NOT the one I stored in this instance
+    newAuthor->email = myStrCpy(email, "\0");
+    newAuthor->commitCount = 1; // is it always 1?
+    newAuthor->modFileList = CreateList(ModFileABC_Comparator, ModFile_Printer, ModFile_Deleter);
+
+    free(fullname);
+    free(email);
+    free(commitHash);
+    free(theTimestamp);
+
+    theTimestamp = NULL;
+    fullname = NULL;
+    email = NULL;
+    commitHash = NULL;
+
+    return newAuthor;
+
 }
 
 
 // Part 4 Functions to implement
-void PrintNLinkedList(list_t* list, FILE* fp, int NUM) {
+void PrintNLinkedList(list_t* list, FILE* fp, int NUM) 
+{
+    if(list == NULL || fp == NULL || NUM < 0 || list->head == NULL)
+    {
+        return;
+    }
+    
+    int printed = 0;
+    node_t* current = list->head; // points to node, not modfile
 
+    while(current != NULL && printed < NUM) // printed max specified or reached end of list 
+    {
+        // use ModFile_Printer
+        ModFile_Printer(current->data, fp, 0);
+        current = current->next;
+        ++printed;
+    }
+    current = NULL;
 }

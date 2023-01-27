@@ -6,6 +6,7 @@
 /*
     My own implementation of strcmp using pointers ONLY 
     Does NOT check if string is properly null terminated!
+    Return 0 if equal, -1 if string1 < string2, 1 if string1 > string2
 */
 int myStrcmp(char* string1, char* string2);
 

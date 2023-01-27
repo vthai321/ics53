@@ -49,7 +49,7 @@ int main() {
     else
         printf("%d (%s) is equal to %d (%s)\n", jwongma.commitCount, jwongma.fullname, mikes->commitCount, mikes->email);
 
-    return 0; // temporary roadblock
+    //return 0; // temporary roadblock
 
     printf("\n\n******AuthorDeleter Test******\n");
     temp->email = email3;

@@ -60,7 +60,6 @@ cf7d587,1653190908,Catherine Zheng,zhonghezheng13579@gmail.com,,finished rating
 8f9c98c,1653188228,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,updated db
 28	13	generateBathrooms.py
 
-6ebaca1,1653186970,Alisa Lu,alisasl@uci.edu,,import
 2807611,1653186785,Nathan Ng,nathan@dhcp-v030-015.mobile.uci.edu,,trunacte
 0	5	generateBathrooms.py
 2	1	mapRate/models.py
