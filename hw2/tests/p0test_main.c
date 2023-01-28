@@ -30,6 +30,17 @@ int main(void) {
     if(strcmp(delims, delims2) != 0) //string.h functions are not allowed in your assignment!!!
         printf("OOPS!!! delims2 was modified - Don't do that!\n");
 
-    printf("Reached end of p0 main");
+    printf("Reached end of p0 main\n");
+    
+    char* myCoolString = "5\t";
+    printf("Test myStrCpy\n");
+    char* newStr = myStrCpy(myCoolString, "\t\0");
+    printf("%s\n", newStr);
+
+    printf("Test string size. Expected: 2\n");
+    int daLength = myStrSize(newStr);
+    printf("Actual: %d\n", daLength);
+
+
     return 0;
 }

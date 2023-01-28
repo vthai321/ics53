@@ -232,56 +232,72 @@ void ProcessModFile(FILE* fp, list_t* list, char ordering)
         return;
     }
 
-    list->comparator = ModFileABC_Comparator; // probably unnecessary, but whatever
+    //list->comparator = ModFileABC_Comparator; // probably unnecessary, but whatever
 
-    int* theInserts = malloc(sizeof(int));
-    int* theDels = malloc(sizeof(int));
-    char* theFilename = malloc(205);
+    char* theInserts  = NULL;
+    char* theDels = NULL;
+    char* theFilename = NULL;
+    char* buffer = (char*)malloc(205);
+    char* current = buffer;
 
-    int scanResult = fscanf(fp, "Total Inserts:%d\tTotal Deletes:%d\t%s\n", theInserts, theDels, theFilename);
-    
-    while(scanResult > 0 && scanResult != EOF) 
+    char* fgetsResult = fgets(buffer, 200, fp);
+    while(myStrcmp(buffer, "\n") != 0 && fgetsResult != NULL) 
     {
-        ModFile* newModFile = malloc(sizeof(ModFile));
-        newModFile = PutModFile(*theInserts, *theDels, myStrCpy(theFilename, NULL), NULL);
+        // parsing algo
+        current = buffer;
+
+        while(*current < 48 || *current > 57) 
+        {
+            ++current; // avoid the letters
+        }
+
+        theInserts = myStrCpy(current, "\t\0");
+        current += myStrSize(theInserts);
+
+        while(*current < 48 || *current > 57) 
+        {
+            ++current; // avoid the letters
+        }
+
+        theDels = myStrCpy(current, "\t\0");
+        current += myStrSize(theDels);
+        theFilename = myStrCpy(current, "\n\0"); // do we include the \n or not
+
+        int insertNum = atoi(theInserts);
+        int deleteNum = atoi(theDels);
+        free(theInserts);
+        free(theDels);
+
+        ModFile* newModFile; // no need to dynamically allocate here, it's already covered
+        newModFile = PutModFile(insertNum, deleteNum, theFilename, NULL); //generates a new struct every time
         node_t* posInList = FindInList(list, newModFile);
         // use findInList to prevent duplicates?
         // update if found
         if(ordering == 'a'&& posInList == NULL)
         {
             InsertInOrder(list, newModFile); 
+            free(theFilename);
         }
         else if(ordering == 'f'&& posInList == NULL)
         {
             InsertAtTail(list, newModFile);
+            free(theFilename);
         }
-        else if(ordering == 'a' && posInList != NULL)
+        else if(posInList != NULL)
         {
             // update ins and dels using putModFile and delete the newModFile
-            PutModFile(*theInserts, *theDels, myStrCpy(theFilename,NULL), posInList->data);
+            PutModFile(insertNum, deleteNum, theFilename, posInList->data);
             ModFile_Deleter(newModFile);
             free(newModFile);
-            newModFile = NULL;
-
-        }
-        else if(ordering == 'f' && posInList != NULL)
-        {
-            // update ins and dels
-            PutModFile(*theInserts, *theDels, myStrCpy(theFilename,NULL), posInList->data);
-            ModFile_Deleter(newModFile);
-            free(newModFile);
-            newModFile = NULL;
+            free(theFilename);
         }
 
-        scanResult = fscanf(fp, "Total Inserts:%d\tTotal Deletes:%d\t%s\n", theInserts, theDels, theFilename);
+        //scanResult = fscanf(fp, "Total Inserts:%d\tTotal Deletes:%d\t%s\n", theInserts, theDels, theFilename);
+        fgetsResult = fgets(buffer, 200, fp);
     }
-    free(theFilename);
-    free(theInserts);
-    free(theDels);
-    theInserts = NULL;
-    theDels = NULL;
-    theFilename = NULL;
-
+    free(buffer);
+    buffer = NULL;
+    current = NULL;
 }
 
 
@@ -428,14 +444,14 @@ Author* CreateAuthor(char* line, long int *timestamp)
     char* linePos = line;
 
     // we'll store commitHash anyways just to see if its empty or not
-    char* commitHash = myStrCpy(linePos, ",");
+    char* commitHash = myStrCpy(linePos, ",\0");
     if(myStrcmp(commitHash, "\0") == 0)
     {
         return NULL; //empty commit field
     }
     linePos += (myStrSize(commitHash));
 
-    char* theTimestamp = myStrCpy(linePos,",");
+    char* theTimestamp = myStrCpy(linePos,",\0");
     long int timestampNum = strtol(theTimestamp, NULL, 10); // passing null means I will increment it manually
         if(timestampNum < 0)
     {
@@ -445,10 +461,10 @@ Author* CreateAuthor(char* line, long int *timestamp)
     linePos += (myStrSize(theTimestamp)); 
     *timestamp = timestampNum;
 
-    char* fullname = myStrCpy(linePos, ","); // copy starting at where we point in the string
+    char* fullname = myStrCpy(linePos, ",\0"); // copy starting at where we point in the string
     linePos += (myStrSize(fullname));// increment pointer by size of string 
 
-    char* email = myStrCpy(linePos, ",");
+    char* email = myStrCpy(linePos, ",\0");
     linePos += (myStrSize(email));
 
     if(myStrcmp(fullname, "\0") == 0 || myStrcmp(email, "\0") == 0)

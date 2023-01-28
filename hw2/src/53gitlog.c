@@ -12,6 +12,13 @@ int main(int argc, char* argv[]) {
     char* OUTFILE = NULL;
     char* INFILE = NULL;
 
+    // additional flags
+    int I_flag = 0;
+    int O_flag = 0;
+    int a_flag = 0; // note capitalization matter
+    int n_flag = 0;
+
+
     // Use basic getopt to parse flags and respective arguments
     int option;
     while ((option = getopt(argc, argv, "HD:A:O:I:n:ad" )) >= 0) {
@@ -28,17 +35,21 @@ int main(int argc, char* argv[]) {
                 LEVEL_arg = atoi(optarg);
                 break;
             case 'n':
-				NUM_arg = atoi(optarg);
+				n_flag = 1;
+                NUM_arg = atoi(optarg);
                 break;
             case 'a':
+                a_flag = 1;
             case 'd':
 				ORDER_arg = option;
                 break;
             case 'O':
-				OUTFILE = optarg;
+				O_flag = 1;
+                OUTFILE = optarg;
                 break;
             case 'I':
-				INFILE = optarg;
+				I_flag = 1;
+                INFILE = optarg;
                 break;
             default:
                 fprintf(stderr, USAGE_MSG);
@@ -55,7 +66,128 @@ int main(int argc, char* argv[]) {
     
     // INSERT YOUR IMPLEMENTATION HERE
     // getopts only stored the arguments and performed basic checks. More error checking is still needed!!!!
+    // tar -C ~/ics53 -cvf hw2_vqthai.tar hw2
 
+    if(A_flag + D_flag > 1)
+    {
+        // cannot have more than 1 required option;
+        fprintf(stderr, USAGE_MSG);
+        return EXIT_FAILURE;
+    }
+
+    // dd/mm/yyyy
+    // check the date
+    // only if D_flag specified
+    if(D_flag)
+    {
+        char* dateCharPointer = DATE_arg;
+        
+        char* dayString = myStrCpy(dateCharPointer, "/");
+        int day = atoi(dayString);
+        free(dayString);
+        dayString = NULL;
+        dateCharPointer += 3;
+
+        char* monthString = myStrCpy(dateCharPointer, "/");
+        int month = atoi(monthString);
+        free(monthString);
+        monthString = NULL;
+        dateCharPointer += 3;
+
+        char* yearString = myStrCpy(dateCharPointer, "/");
+        int year = atoi(yearString);
+        free(yearString);
+        monthString = NULL;
+
+        if(day < 1 || day > 31)
+        {
+            fprintf(stderr, USAGE_MSG);
+            return EXIT_FAILURE;
+        }
+        else if(month < 1 || month > 12)
+        {
+            fprintf(stderr, USAGE_MSG);
+            return EXIT_FAILURE;
+        }
+        else if(year < 0 || year > 9999)
+        {
+            fprintf(stderr, USAGE_MSG);
+            return EXIT_FAILURE;
+        }
+    }
+
+    // check file, if we indicated we're passing one in
+    if(I_flag)
+    {
+        if(INFILE == NULL || myStrcmp(INFILE, "") == 0)
+        {
+            //fprintf(stderr, USAGE_MSG);
+            return 2;
+        }
+        else if(fopen(INFILE, "r") == NULL)
+        {
+            return 2;
+        }
+
+    }
+
+    if(O_flag)
+    {
+        if(fopen(OUTFILE, "w") == NULL)
+        {
+            return 2;
+        }
+    }
+
+    // build the linkedLists
+    
+    list_t* modFileList = CreateList(ModFileABC_Comparator, ModFile_Printer, ModFile_Deleter); // might need to switch out comparators depending on flag
+    list_t* authorList =  CreateList(ModFileABC_Comparator, ModFile_Printer, ModFile_Deleter); 
+
+    // we will read both author and modFile
+    FILE* fp = NULL;
+    if(I_flag)
+    {
+        fp = fopen(INFILE, "r");
+    }
+    else
+    {
+        fp = stdin;
+    }
+    
+    if(D_flag)
+    {
+        // don't need author
+        char* buffer = malloc(200);
+        while(fgets(buffer, 200, fp) != NULL) // putting it here will skip all the author lines
+        {  
+            ProcessModFile(fp, modFileList, 'f'); // loop until we read the blank line
+        }
+        free(buffer);
+        buffer = NULL;
+    }
+
+    // print here
+    if(n_flag)
+    {
+
+    }
+    else
+    {
+        if(O_flag)
+        {
+            FILE* outfp = fopen(OUTFILE, "w");
+            PrintLinkedList(modFileList, outfp);
+        }
+        else
+        {
+            PrintLinkedList(modFileList, stdout);
+        }
+    }
+
+    //delete the lists (also frees it)
+    DestroyList(&modFileList);
+    DestroyList(&authorList);
 
     return 0;
 }

@@ -119,7 +119,7 @@ void PrintLinkedList(list_t* list, FILE* fp) {
     node_t* head = list->head;
     while (head != NULL) {
         list->printer(head->data, fp, 0);
-        fprintf(fp, "\n");
+        //fprintf(fp, "\n"); // get rid of the \n?
         head = head->next;
     }
 }
