@@ -1,4 +1,5 @@
 #include "icssh.h"
+#include "linkedList.h"
 #include <readline/readline.h>
 
 int main(int argc, char* argv[]) {
@@ -7,6 +8,12 @@ int main(int argc, char* argv[]) {
 	pid_t pid;
 	pid_t wait_result;
 	char* line;
+
+	// initialize 
+	List_t gentry_List;
+	gentry_List.head = NULL;
+	gentry_List.length = 0;
+
 #ifdef GS
     rl_outstream = fopen("/dev/null", "w");
 #endif
@@ -19,7 +26,7 @@ int main(int argc, char* argv[]) {
 
     	// print the prompt & wait for the user to enter commands string
 	while ((line = readline(SHELL_PROMPT)) != NULL) {
-        	// MAGIC HAPPENS! Command string is parsed into a job struct
+			// MAGIC HAPPENS! Command string is parsed into a job struct
         	// Will print out error message if command string is invalid
 		job_info* job = validate_input(line);
         	if (job == NULL) { // Command was empty string or invalid
@@ -87,14 +94,43 @@ int main(int argc, char* argv[]) {
 		//builtin command to get exit status of most recently reaped program (aka child process)
 		if(strcmp(job->procs->cmd, "estatus") == 0)
 		{
-			fprintf(stdout, "%d\n", exit_status); // is it this easy 
+			fprintf(stdout, "%d\n", exit_status); // is it this easy
+			continue; 
 		}
 
 		// example of good error handling!
+		// the part where we fork
 		if ((pid = fork()) < 0) {
 			perror("fork error");
 			exit(EXIT_FAILURE);
 		}
+
+		// part 2
+		// the job info struct returned by the tokenizer will set the bg field to yes <-- use that!!!
+		// put it after fork
+		if(job->bg == 1)
+		{
+			bgentry_t* newBgentry = malloc(sizeof(bgentry_t));
+			newBgentry->job = job->procs->cmd;
+			newBgentry->pid = pid; 
+			newBgentry->seconds = time(NULL); 
+			
+			if(gentry_List.head == NULL)
+			{
+				// initialize the first gentry struct, then make it the head
+				gentry_List.head = newBgentry;  //FIX LATER ... BE SURE TO MAKE THE NODE FIRST
+			}
+			else
+			{
+				// use the comparator to insert into the list
+				// otherwise, insert based on time
+				insertInOrder(&gentry_List, newBgentry);
+			}
+			++gentry_List.length;
+		}
+
+
+		// the part where we do jobs with parents and children
 		if (pid == 0) {  //If zero, then it's the child process
             	//get the first command in the job list
 		    proc_info* proc = job->procs;
