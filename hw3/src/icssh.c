@@ -1,4 +1,5 @@
 #include "icssh.h"
+#include "helpers.h"
 #include "linkedList.h"
 #include <readline/readline.h>
 
@@ -9,10 +10,14 @@ int main(int argc, char* argv[]) {
 	pid_t wait_result;
 	char* line;
 
-	// initialize 
+	// initialize the gentry list
 	List_t gentry_List;
 	gentry_List.head = NULL;
 	gentry_List.length = 0;
+	
+	// function pointer stuff
+	int (*timeCompare)(void*, void*) = &bGentryTime_Comparator;
+	gentry_List.comparator = timeCompare;
 
 #ifdef GS
     rl_outstream = fopen("/dev/null", "w");
@@ -111,20 +116,25 @@ int main(int argc, char* argv[]) {
 		if(job->bg == 1)
 		{
 			bgentry_t* newBgentry = malloc(sizeof(bgentry_t));
-			newBgentry->job = job->procs->cmd;
+			newBgentry->job = job;
 			newBgentry->pid = pid; 
 			newBgentry->seconds = time(NULL); 
+
+			// make the node here
+			node_t* newBgNode = malloc(sizeof(node_t)); // dynamically allocated to perserve it 
+			newBgNode->value = newBgentry;
+			newBgNode->next = NULL;
 			
 			if(gentry_List.head == NULL)
 			{
-				// initialize the first gentry struct, then make it the head
-				gentry_List.head = newBgentry;  //FIX LATER ... BE SURE TO MAKE THE NODE FIRST
+				// stick the node in 
+				gentry_List.head = newBgNode;
 			}
 			else
 			{
 				// use the comparator to insert into the list
 				// otherwise, insert based on time
-				insertInOrder(&gentry_List, newBgentry);
+				insertInOrder(&gentry_List, newBgNode);
 			}
 			++gentry_List.length;
 		}

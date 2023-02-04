@@ -8,4 +8,4 @@ Parameters: bGentryOne and bGentryTwo, 2 const void* pointers that will be caste
 Return Values: 0 if equal, -1 if one < two, 1 if two > one
 
 */
-int bGentryTime_Comparator(const void* bGentryOne, const void* bGentryTwo);
+int bGentryTime_Comparator(void* bGentryOne, void* bGentryTwo);
