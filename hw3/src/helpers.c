@@ -21,3 +21,9 @@ int bGentryTime_Comparator(void* bGentryOne, void* bGentryTwo)
     }
 
 }
+
+void sigchldHandler(int sig)
+{
+    // set a conditional flag denoting terminated child
+    
+}

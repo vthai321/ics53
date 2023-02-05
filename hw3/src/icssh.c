@@ -10,6 +10,9 @@ int main(int argc, char* argv[]) {
 	pid_t wait_result;
 	char* line;
 
+	// flag for terminated child
+	int terminatedChild = 0;
+
 	// initialize the gentry list
 	List_t gentry_List;
 	gentry_List.head = NULL;
@@ -17,7 +20,7 @@ int main(int argc, char* argv[]) {
 	
 	// function pointer stuff
 	int (*timeCompare)(void*, void*) = &bGentryTime_Comparator;
-	gentry_List.comparator = timeCompare;
+	gentry_List.comparator = timeCompare; // is this the right way to use a function pointer?
 
 #ifdef GS
     rl_outstream = fopen("/dev/null", "w");
@@ -37,6 +40,12 @@ int main(int argc, char* argv[]) {
         	if (job == NULL) { // Command was empty string or invalid
 			free(line);
 			continue;
+		}
+
+		// check if conditional flag for terminatedChild is set
+		if(terminatedChild)
+		{
+			// reap all terminated background child processes, 1 at a time
 		}
 
         	//Prints out the job linked list struture for debugging
@@ -113,8 +122,10 @@ int main(int argc, char* argv[]) {
 		// part 2
 		// the job info struct returned by the tokenizer will set the bg field to yes <-- use that!!!
 		// put it after fork
-		if(job->bg == 1)
+		if(job->bg == 1 && pid == 0)
 		{
+			printf("INITIATING BACKGROUND PROCESS CODE\n");
+			
 			bgentry_t* newBgentry = malloc(sizeof(bgentry_t));
 			newBgentry->job = job;
 			newBgentry->pid = pid; 
@@ -127,7 +138,7 @@ int main(int argc, char* argv[]) {
 			
 			if(gentry_List.head == NULL)
 			{
-				// stick the node in 
+				// stick the node in as the head
 				gentry_List.head = newBgNode;
 			}
 			else
@@ -138,6 +149,8 @@ int main(int argc, char* argv[]) {
 			}
 			++gentry_List.length;
 		}
+
+		// SIGCHLD handler goes here (or anywhere)
 
 
 		// the part where we do jobs with parents and children
