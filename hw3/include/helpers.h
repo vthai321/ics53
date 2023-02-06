@@ -1,3 +1,8 @@
+#include "linkedList.h"
+
+// flag for terminated child (bg) (global)
+extern int terminatedChild;
+
 // A header file for helpers.c
 // Declare any additional functions in this file
 
@@ -15,3 +20,12 @@ int bGentryTime_Comparator(void* bGentryOne, void* bGentryTwo);
     Return Values: none
 */
 void sigchldHandler(int sig);
+
+/*
+Iterates thru the bgentry list and deletes terminated processes (using a counter and removebyindex)
+A process (node) is terminated if 
+Also prints BG_TERM for the terminated nodes
+Parameters: List_t* list, the list to modify
+Return Values: none
+*/
+void terminateDeleter(List_t* list);

@@ -3,6 +3,9 @@
 #include "linkedList.h"
 #include <readline/readline.h>
 
+// flag for terminated child (bg) (global)
+int terminatedChild = 0;
+
 int main(int argc, char* argv[]) {
 	int exec_result;
 	int exit_status;
@@ -10,17 +13,14 @@ int main(int argc, char* argv[]) {
 	pid_t wait_result;
 	char* line;
 
-	// flag for terminated child
-	int terminatedChild = 0;
-
-	// initialize the gentry list
-	List_t gentry_List;
-	gentry_List.head = NULL;
-	gentry_List.length = 0;
+	// initialize the bgentry list
+	List_t bgentry_List;
+	bgentry_List.head = NULL;
+	bgentry_List.length = 0;
 	
 	// function pointer stuff
 	int (*timeCompare)(void*, void*) = &bGentryTime_Comparator;
-	gentry_List.comparator = timeCompare; // is this the right way to use a function pointer?
+	bgentry_List.comparator = timeCompare; // is this the right way to use a function pointer?
 
 #ifdef GS
     rl_outstream = fopen("/dev/null", "w");
@@ -42,10 +42,18 @@ int main(int argc, char* argv[]) {
 			continue;
 		}
 
-		// check if conditional flag for terminatedChild is set
+		// temporary? place for my signal handler (ask if we can use unix_error for this assignment)
+		signal(SIGCHLD, sigchldHandler);
+
+		// check if conditional flag for terminatedChild is set 
 		if(terminatedChild)
 		{
 			// reap all terminated background child processes, 1 at a time
+			// to reap a child, call waitpid() before exit()
+			// use pid to determine which process to terminate?
+			waitpid(pid, &exit_status, 0); 
+			// remove it from the bgentry
+
 		}
 
         	//Prints out the job linked list struture for debugging
@@ -136,24 +144,24 @@ int main(int argc, char* argv[]) {
 			newBgNode->value = newBgentry;
 			newBgNode->next = NULL;
 			
-			if(gentry_List.head == NULL)
+			if(bgentry_List.head == NULL)
 			{
 				// stick the node in as the head
-				gentry_List.head = newBgNode;
+				bgentry_List.head = newBgNode;
 			}
 			else
 			{
 				// use the comparator to insert into the list
 				// otherwise, insert based on time
-				insertInOrder(&gentry_List, newBgNode);
+				insertInOrder(&bgentry_List, newBgNode);
 			}
-			++gentry_List.length;
+			++bgentry_List.length;
 		}
 
-		// SIGCHLD handler goes here (or anywhere)
+		// SIGCHLD handler goes here (or anywhere or even at the beginning of loop???)
 
 
-		// the part where we do jobs with parents and children
+		// the part where we do jobs with parents and children (for fg?)
 		if (pid == 0) {  //If zero, then it's the child process
             	//get the first command in the job list
 		    proc_info* proc = job->procs;
