@@ -134,7 +134,7 @@ int main(int argc, char* argv[]) {
 		//builtin command to get exit status of most recently reaped program (aka child process)
 		if(strcmp(job->procs->cmd, "estatus") == 0)
 		{
-			fprintf(stdout, "%d\n", exit_status); // is it this easy
+			fprintf(stdout, "%d\n", WEXITSTATUS(exit_status)); // is it this easy
 			continue; 
 		}
 

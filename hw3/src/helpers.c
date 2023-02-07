@@ -41,7 +41,6 @@ void terminateDeleter(List_t* list, int terminatePID)
         // find the node to delete based on PID
         // then free everything in the node before deleting the node itself
         char* cmd = currentBGentry->job->procs->cmd;
-        printf("COMMAND TO DELETE: %s\n", cmd);
         int currentPID = currentBGentry->pid;
         if(currentPID == terminatePID)
         {            
