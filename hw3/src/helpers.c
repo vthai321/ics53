@@ -40,7 +40,9 @@ void terminateDeleter(List_t* list, int terminatePID)
     {
         // find the node to delete based on PID
         // then free everything in the node before deleting the node itself
-        char* cmd = currentBGentry->job->procs->cmd;
+        char cmd[300];
+        strncpy(cmd, currentBGentry->job->line, 300);
+        cmd[300] = '\0'; // just in case  
         int currentPID = currentBGentry->pid;
         if(currentPID == terminatePID)
         {            
@@ -61,4 +63,18 @@ void terminateDeleter(List_t* list, int terminatePID)
             ++index;
         }
     }
+}
+
+void sigusr2Handler(int sig)
+{
+    // should implement some signal blockers here using sigprogmask
+    // block the whole thing, feel free to use anything!!!!!!!!!!!!
+    // also, write is the only async safe thing to use
+    // pid of the process that receives the signal (use getpid)
+
+    int callerPid = (int)getpid();
+    char myMsg[100];
+
+    sprintf(myMsg, "Hi User! I am process %d\n", callerPid);
+    write(1, myMsg, 100);
 }

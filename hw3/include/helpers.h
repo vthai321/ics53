@@ -1,7 +1,10 @@
 #include "linkedList.h"
+#include <signal.h>
+#include <unistd.h>
 
-// flag for terminated child (bg) (global)
-extern int terminatedChild;
+// flag for terminated child (bg) (global) (should change to volatile sig_atomic t)
+//extern int terminatedChild;
+extern volatile sig_atomic_t terminatedChild;
 
 // A header file for helpers.c
 // Declare any additional functions in this file
@@ -29,3 +32,11 @@ Parameters: List_t* list, the list to modify
 Return Values: none
 */
 void terminateDeleter(List_t* list, int terminatePID);
+
+/*
+Handles the SIGUSR2 signal (custom signal); if sent to shell process, print to stdout with specs in hw doc
+Parameters: int sig, the signal to process 
+Return Values: None
+*/
+void sigusr2Handler(int sig);
+

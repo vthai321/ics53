@@ -4,7 +4,8 @@
 #include <readline/readline.h>
 
 // flag for terminated child (bg) (global)
-int terminatedChild = 0;
+//int terminatedChild = 0;
+volatile sig_atomic_t terminatedChild = 0;
 
 int main(int argc, char* argv[]) {
 	int exec_result;
@@ -80,6 +81,8 @@ int main(int argc, char* argv[]) {
         	#endif
 
 		// example built-in: exit
+		// for part 3: modify to kill ALL running background jobs before termination
+		// print BG_TERM, aim to use delete_list
 		if (strcmp(job->procs->cmd, "exit") == 0) {
 			// Terminating the shell
 			free(line);
@@ -205,10 +208,10 @@ int main(int argc, char* argv[]) {
 		{
 			free_job(job);  // if a foreground job, we no longer need the data
 		}
+		free(line);
 	}
-    	// calling validate_input with NULL will free the memory it has allocated
-    	free(line); // ask
-		validate_input(NULL);
+    // calling validate_input with NULL will free the memory it has allocated
+	validate_input(NULL);
 
 #ifndef GS
 	fclose(rl_outstream);
