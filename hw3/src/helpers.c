@@ -30,15 +30,36 @@ void sigchldHandler(int sig)
     
 }
 
-void terminateDeleter(List_t* list)
+void terminateDeleter(List_t* list, int terminatePID)
 {
     int index = 0;
     node_t* current = list->head;
-    while(current != NULL) // should handle the empty case, but do watch out
+    bgentry_t* currentBGentry = (bgentry_t*)(current->value);
+
+    while(current != NULL) 
     {
-        // f it lets just delete everything (to see if it works )
-        removeByIndex(list, index);
-        current = current->next;
-        ++index;
+        // find the node to delete based on PID
+        // then free everything in the node before deleting the node itself
+        char* cmd = currentBGentry->job->procs->cmd;
+        printf("COMMAND TO DELETE: %s\n", cmd);
+        int currentPID = currentBGentry->pid;
+        if(currentPID == terminatePID)
+        {            
+            // now free the job in bgentry
+            free_job(currentBGentry->job);
+            // now delete the node
+            free(currentBGentry);
+            currentBGentry = NULL;
+            
+            removeByIndex(list, index);
+            printf(BG_TERM, terminatePID, cmd);
+            return;
+        }
+        else
+        {
+            current = current->next;
+            currentBGentry = (bgentry_t*)(current->value);
+            ++index;
+        }
     }
 }

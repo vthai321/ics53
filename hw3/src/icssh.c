@@ -32,6 +32,13 @@ int main(int argc, char* argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
+	// Setup SIGCHLD fault handler
+	if(signal(SIGCHLD, sigchldHandler) == SIG_ERR)
+	{
+		perror("Failed to set signal handler");
+		exit(EXIT_FAILURE);
+	}
+
     	// print the prompt & wait for the user to enter commands string
 	while ((line = readline(SHELL_PROMPT)) != NULL) {
 			// MAGIC HAPPENS! Command string is parsed into a job struct
@@ -42,20 +49,31 @@ int main(int argc, char* argv[]) {
 			continue;
 		}
 
-		// temporary? place for my signal handler (ask if we can use unix_error for this assignment)
-		signal(SIGCHLD, sigchldHandler);
-
 		// check if conditional flag for terminatedChild is set 
-		if(terminatedChild)
-		{
-			// reap all terminated background child processes, 1 at a time
-			// to reap a child, call waitpid() before exit()
-			// use pid to determine which process to terminate?
-			waitpid(pid, &exit_status, 0); 
-			// remove it from the bgentry
-
+		// reap all terminated background child processes, 1 at a time
+		// to reap a child, call waitpid() before exit()
+		// use pid to determine which process to terminate?
+		if(terminatedChild == 1)
+		{	
+			// while loop thru every node
+			int listLen = 0;
+			while(listLen < bgentry_List.length)
+			{
+				int terminatePID = waitpid(0, &exit_status, WNOHANG);
+				if(terminatePID == 0 || terminatePID == -1)
+				{
+					++listLen;
+					continue;
+				}
+				else
+				{ 
+					//remove it from the bgentry
+					++listLen;
+					terminateDeleter(&bgentry_List, terminatePID);
+				}
+			}
+			terminatedChild = 0;
 		}
-
         	//Prints out the job linked list struture for debugging
         	#ifdef DEBUG   // If DEBUG flag removed in makefile, this will not longer print
             		debug_print_job(job);
@@ -120,6 +138,20 @@ int main(int argc, char* argv[]) {
 			continue; 
 		}
 
+		//bglist
+		if(strcmp(job->procs->cmd, "bglist") == 0)
+		{
+			node_t* bglistCurrent = bgentry_List.head;
+			while(bglistCurrent != NULL)
+			{
+				
+				print_bgentry((bgentry_t*)(bglistCurrent->value));
+				bglistCurrent = bglistCurrent->next;
+			}
+			continue;
+		}
+
+
 		// example of good error handling!
 		// the part where we fork
 		if ((pid = fork()) < 0) {
@@ -130,36 +162,16 @@ int main(int argc, char* argv[]) {
 		// part 2
 		// the job info struct returned by the tokenizer will set the bg field to yes <-- use that!!!
 		// put it after fork
-		if(job->bg == 1 && pid == 0)
-		{
-			printf("INITIATING BACKGROUND PROCESS CODE\n");
-			
+		if(job->bg == 1 && pid != 0) // parent only 
+		{	
 			bgentry_t* newBgentry = malloc(sizeof(bgentry_t));
 			newBgentry->job = job;
 			newBgentry->pid = pid; 
 			newBgentry->seconds = time(NULL); 
 
-			// make the node here
-			node_t* newBgNode = malloc(sizeof(node_t)); // dynamically allocated to perserve it 
-			newBgNode->value = newBgentry;
-			newBgNode->next = NULL;
-			
-			if(bgentry_List.head == NULL)
-			{
-				// stick the node in as the head
-				bgentry_List.head = newBgNode;
-			}
-			else
-			{
-				// use the comparator to insert into the list
-				// otherwise, insert based on time
-				insertInOrder(&bgentry_List, newBgNode);
-			}
-			++bgentry_List.length;
+			// use the comparator to insert into the list (already makes the node)
+			insertInOrder(&bgentry_List, newBgentry);
 		}
-
-		// SIGCHLD handler goes here (or anywhere or even at the beginning of loop???)
-
 
 		// the part where we do jobs with parents and children (for fg?)
 		if (pid == 0) {  //If zero, then it's the child process
@@ -179,19 +191,24 @@ int main(int argc, char* argv[]) {
 			}
 		} else {
             		// As the parent, wait for the foreground job to finish
-			wait_result = waitpid(pid, &exit_status, 0);
-			if (wait_result < 0) {
-				printf(WAIT_ERR);
-				exit(EXIT_FAILURE);
+			if(job->bg == 0)
+			{
+				wait_result = waitpid(pid, &exit_status, 0);
+				if (wait_result < 0) 
+				{
+					printf(WAIT_ERR);
+					exit(EXIT_FAILURE);
+				}
 			}
 		}
-
-		free_job(job);  // if a foreground job, we no longer need the data
-		free(line);
+		if(job->bg == 0)
+		{
+			free_job(job);  // if a foreground job, we no longer need the data
+		}
 	}
-
     	// calling validate_input with NULL will free the memory it has allocated
-    	validate_input(NULL);
+    	free(line); // ask
+		validate_input(NULL);
 
 #ifndef GS
 	fclose(rl_outstream);

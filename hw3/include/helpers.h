@@ -28,4 +28,4 @@ Also prints BG_TERM for the terminated nodes
 Parameters: List_t* list, the list to modify
 Return Values: none
 */
-void terminateDeleter(List_t* list);
+void terminateDeleter(List_t* list, int terminatePID);
