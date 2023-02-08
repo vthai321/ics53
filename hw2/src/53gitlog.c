@@ -2,6 +2,9 @@
 #include "helpers2.h"
 #include "hw2.h"
 
+#define _XOPEN_SOURCE
+#include <time.h>
+
 int main(int argc, char* argv[]) {
 	int D_flag = 0;
 	int A_flag = 0;
@@ -78,6 +81,8 @@ int main(int argc, char* argv[]) {
     // dd/mm/yyyy
     // check the date
     // only if D_flag specified
+    time_t gitDate; // on standby 
+    
     if(D_flag)
     {
         char* dateCharPointer = DATE_arg;
@@ -109,11 +114,20 @@ int main(int argc, char* argv[]) {
             fprintf(stderr, USAGE_MSG);
             return EXIT_FAILURE;
         }
-        else if(year < 0 || year > 9999)
+        else if(year < 1900 || year > 9999)
         {
             fprintf(stderr, USAGE_MSG);
             return EXIT_FAILURE;
         }
+
+        int convertYear = year - 1900;
+
+        struct tm myTime;
+        myTime.tm_year = convertYear;
+        myTime.tm_mon = month;
+        myTime.tm_mday = day;
+        gitDate = mktime(&myTime);
+
     }
 
     // check file, if we indicated we're passing one in
@@ -141,8 +155,8 @@ int main(int argc, char* argv[]) {
 
     // build the linkedLists
     
-    list_t* modFileList = CreateList(ModFileABC_Comparator, ModFile_Printer, ModFile_Deleter); // might need to switch out comparators depending on flag
-    list_t* authorList =  CreateList(ModFileABC_Comparator, ModFile_Printer, ModFile_Deleter); 
+    list_t* modFileList = CreateList(ModFileABC_Comparator, ModFile_Printer, ModFile_Deleter); // 
+    list_t* authorList =  CreateList(ModFileABC_Comparator, ModFile_Printer, ModFile_Deleter); // 
 
     // we will read both author and modFile
     FILE* fp = NULL;
@@ -155,16 +169,28 @@ int main(int argc, char* argv[]) {
         fp = stdin;
     }
     
-    if(D_flag)
+    if(D_flag || A_flag)
     {
-        // don't need author
+        // might need author
         char* buffer = malloc(200);
-        while(fgets(buffer, 200, fp) != NULL) // putting it here will skip all the author lines
+        long int* timeStampBuffer = malloc(sizeof(long int));
+        while(fgets(buffer, 200, fp) != NULL) // putting it here will get all the author lines
         {  
-            ProcessModFile(fp, modFileList, 'f'); // loop until we read the blank line
+            Author* newAuthor = CreateAuthor(buffer, timeStampBuffer);
+            if(*timeStampBuffer > gitDate)
+            {
+                ProcessModFile(fp, modFileList, 'f'); // loop until we read the blank line
+            }
+            
+            if(FindInList(authorList, newAuthor) == NULL)
+            {
+                InsertInOrder(authorList, newAuthor);
+            }
         }
         free(buffer);
         buffer = NULL;
+        free(timeStampBuffer);
+         timeStampBuffer = NULL;
     }
 
     // print here
@@ -176,12 +202,29 @@ int main(int argc, char* argv[]) {
     {
         if(O_flag)
         {
-            FILE* outfp = fopen(OUTFILE, "w");
-            PrintLinkedList(modFileList, outfp);
+            if(D_flag)
+            {
+                FILE* outfp = fopen(OUTFILE, "w");
+                PrintLinkedList(modFileList, outfp);
+            }
+            else if(A_flag)
+            {
+
+            }
         }
         else
         {
-            PrintLinkedList(modFileList, stdout);
+            if(D_flag)
+            {
+                PrintLinkedList(modFileList, stdout);
+            }
+            else if(A_flag)
+            {
+                if(LEVEL_arg == 0)
+                {
+                    PrintLinkedList(authorList, stdout);
+                }
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main()
+int main(void)
 {
 	char i = 'A', j = 'Z';
 	char *p  = &i;

@@ -40,6 +40,13 @@ int main(int argc, char* argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
+	// Setup SIGGUSR2 fault handler
+	if(signal(SIGUSR2, sigusr2Handler) == SIG_ERR)
+	{
+		perror("Failed to set signal handler");
+		exit(EXIT_FAILURE);
+	}
+
     	// print the prompt & wait for the user to enter commands string
 	while ((line = readline(SHELL_PROMPT)) != NULL) {
 			// MAGIC HAPPENS! Command string is parsed into a job struct
@@ -83,7 +90,12 @@ int main(int argc, char* argv[]) {
 		// example built-in: exit
 		// for part 3: modify to kill ALL running background jobs before termination
 		// print BG_TERM, aim to use delete_list
-		if (strcmp(job->procs->cmd, "exit") == 0) {
+		// should be restricted to shell process, right? (ask to clarify)
+		if (strcmp(job->procs->cmd, "exit") == 0) 
+		{
+			// clear the bg process list and kill all bg processes
+			// todo, fix seg fault
+			terminateAll(&bgentry_List);
 			// Terminating the shell
 			free(line);
 			free_job(job);

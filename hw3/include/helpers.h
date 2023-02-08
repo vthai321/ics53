@@ -40,3 +40,13 @@ Return Values: None
 */
 void sigusr2Handler(int sig);
 
+/*
+A modified version of terminateDeleter.
+Iterates through the bgentry list, prints the necessary info w/ BG_TERM, and frees the bgentry struct as well as the job struct inside
+Then at the end calls deleteList to delete the data structure
+Parameters: list_t* list, the list to destroy
+Return Values: none
+*/
+void terminateAll(List_t* list);
+
+
