@@ -125,7 +125,7 @@ void terminateAll(List_t* list)
     // deleteList(list); not applicable to a static list
 }
 
-int shellRedirection(job_info* job)
+int shellRedirection(job_info* job, char* line)
 {
     
     // part 4
@@ -133,6 +133,7 @@ int shellRedirection(job_info* job)
     int fd2 = 0; // output
     int fd3 = 0; // error
     int pid;
+    int exec_result;
     
     if(job->in_file != NULL && job->out_file!=NULL)
     {
@@ -181,21 +182,161 @@ int shellRedirection(job_info* job)
             // use dup
             dup2(fd2, 1); // stdout now refers to output file
             dup2(fd1, 0); // stdin now refers to input file
+            if(job->procs->err_file != NULL)
+            {
+                dup2(fd3, 2);
+            }
 
             // call execvp
-            execvp(job->procs->cmd, job->procs->argv);
-        }
-        
-            
+            exec_result = execvp(job->procs->cmd, job->procs->argv);
+            if (exec_result < 0) 
+            {  //Error checking
+            printf(EXEC_ERR, job->procs->cmd);
+            // Cleaning up to make Valgrind happy 
+            // (not necessary because child will exit. Resources will be reaped by parent)
+            free_job(job);  
+            free(line);
+            validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+            exit(EXIT_FAILURE);
+            }  
+        }  
     }
     else if(job->in_file != NULL)
     {
-        // < provided only
+        // < provided only aka input only
+        if(job->procs->err_file != NULL)
+        {
+            if(strcmp(job->procs->err_file, job->in_file) == 0)
+            {
+                //cannot use 2 operators on same file
+                fprintf(stderr, RD_ERR);
+                return -1;
+            }
+        }
+
+        // time to fork
+        if ((pid = fork()) < 0) 
+        {
+			perror("fork error");
+			exit(EXIT_FAILURE);
+		}
+
+        if(pid == 0)
+        {
+            fd1 = open(job->in_file, O_RDONLY);
+            if(job->procs->err_file != NULL)
+            {
+                fd3 = open(job->procs->err_file, O_RDONLY | O_CREAT);
+            }
+            if(fd1 < 0 || fd3 < 0)
+            {
+                perror("file error");
+                exit(0);
+            }
+
+            dup2(fd1, 0);
+            if(job->procs->err_file != NULL)
+            {
+                dup2(fd3, 2);
+            }
+            exec_result = execvp(job->procs->cmd, job->procs->argv);
+            if (exec_result < 0) 
+            {  //Error checking
+            printf(EXEC_ERR, job->procs->cmd);
+            // Cleaning up to make Valgrind happy 
+            // (not necessary because child will exit. Resources will be reaped by parent)
+            free_job(job);  
+            free(line);
+            validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+            exit(EXIT_FAILURE);
+            }           
+        }
+
     }
     else if(job->out_file != NULL)
     {
-        // > provided only
+        // > provided only aka output only
         // name is always passed, even if the file initially does not exist?
+        if(job->procs->err_file != NULL)
+        {
+            if(strcmp(job->procs->err_file, job->out_file) == 0)
+            {
+                //cannot use 2 operators on same file
+                fprintf(stderr, RD_ERR);
+                return -1;
+            }
+        }
+
+        // time to fork
+        if ((pid = fork()) < 0) 
+        {
+			perror("fork error");
+			exit(EXIT_FAILURE);
+		}
+
+        if(pid == 0)
+        {
+            fd2 = open(job->out_file, O_WRONLY | O_CREAT);
+            if(job->procs->err_file != NULL)
+            {
+                fd3 = open(job->procs->err_file, O_RDONLY | O_CREAT);
+            }
+            if(fd2 < 0 || fd3 < 0)
+            {
+                perror("file error");
+                exit(0);
+            }
+
+            dup2(fd2, 1);
+            if(job->procs->err_file != NULL)
+            {
+                dup2(fd3, 2);
+            }
+            exec_result = execvp(job->procs->cmd, job->procs->argv);
+            if (exec_result < 0) 
+            {  //Error checking
+            printf(EXEC_ERR,  job->procs->cmd);
+            // Cleaning up to make Valgrind happy 
+            // (not necessary because child will exit. Resources will be reaped by parent)
+            free_job(job);  
+            free(line);
+            validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+            exit(EXIT_FAILURE);
+            }           
+        }
+    }
+    else if(job->procs->err_file != NULL)
+    {
+        // 2> only
+        
+        // time to fork
+        if ((pid = fork()) < 0) 
+        {
+			perror("fork error");
+			exit(EXIT_FAILURE);
+		}
+
+        if(pid == 0)
+        {
+            fd3 = open(job->procs->err_file, O_RDONLY | O_CREAT);
+            dup2(fd3, 2);
+            
+            exec_result = execvp(job->procs->cmd, job->procs->argv);
+            if (exec_result < 0) 
+            {  //Error checking
+            printf(EXEC_ERR, job->procs->cmd);
+            // Cleaning up to make Valgrind happy 
+            // (not necessary because child will exit. Resources will be reaped by parent)
+            free_job(job);  
+            free(line);
+            validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+            exit(EXIT_FAILURE);
+            }  
+        }
+    }
+    else
+    {
+        return 69; // nothing done involving redirection
     }
     return 0;
 }

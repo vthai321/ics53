@@ -168,7 +168,10 @@ int main(int argc, char* argv[]) {
 
 		// part 4 
 		// insert shellRedirection() here
-
+		if(shellRedirection(job, line) != 69)
+		{
+			continue; // we did something involving redirection
+		}
 
 		// example of good error handling!
 		// the part where we fork

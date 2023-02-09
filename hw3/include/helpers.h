@@ -52,9 +52,9 @@ void terminateAll(List_t* list);
 
 /*
 Handles the redirection portion of the shell
-Parameters: job_info* job, the job struct where we get relevent data
+Parameters: job_info* job, the job struct where we get relevent data, char* line, the buffer for the command
 Return values: 0 on success, -1 on failure
 */
-int shellRedirection(job_info* job);
+int shellRedirection(job_info* job, char* line);
 
 
