@@ -1,4 +1,5 @@
 #include "linkedList.h"
+#include "icssh.h"
 #include <signal.h>
 #include <unistd.h>
 
@@ -48,5 +49,12 @@ Parameters: list_t* list, the list to destroy
 Return Values: none
 */
 void terminateAll(List_t* list);
+
+/*
+Handles the redirection portion of the shell
+Parameters: job_info* job, the job struct where we get relevent data
+Return values: 0 on success, -1 on failure
+*/
+int shellRedirection(job_info* job);
 
 

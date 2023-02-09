@@ -166,6 +166,9 @@ int main(int argc, char* argv[]) {
 			continue;
 		}
 
+		// part 4 
+		// insert shellRedirection() here
+
 
 		// example of good error handling!
 		// the part where we fork
