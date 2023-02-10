@@ -55,6 +55,6 @@ Handles the redirection portion of the shell
 Parameters: job_info* job, the job struct where we get relevent data, char* line, the buffer for the command
 Return values: 0 on success, -1 on failure
 */
-int shellRedirection(job_info* job, char* line);
+int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_status);
 
 

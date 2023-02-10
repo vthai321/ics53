@@ -168,9 +168,9 @@ int main(int argc, char* argv[]) {
 
 		// part 4 
 		// insert shellRedirection() here
-		if(shellRedirection(job, line) != 69)
+		if(shellRedirection(job, line, &wait_result, &exit_status) != 69)
 		{
-			continue; // we did something involving redirection
+			continue; // we did something involving redirection (including errors)
 		}
 
 		// example of good error handling!

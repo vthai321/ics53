@@ -125,7 +125,7 @@ void terminateAll(List_t* list)
     // deleteList(list); not applicable to a static list
 }
 
-int shellRedirection(job_info* job, char* line)
+int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_status)
 {
     
     // part 4
@@ -135,7 +135,7 @@ int shellRedirection(job_info* job, char* line)
     int pid;
     int exec_result;
     
-    if(job->in_file != NULL && job->out_file!=NULL)
+    if(job->in_file != NULL && job->out_file != NULL)
     {
         // > and < both provided
         // name is always passed, even if the file initially does not exist?
@@ -175,8 +175,8 @@ int shellRedirection(job_info* job, char* line)
             }
             if(fd1 < 0 || fd2 < 0 || fd3 < 0)
             {
-                perror("file error");
-                exit(0);
+                fprintf(stderr, RD_ERR);
+                return -1;
             }
 
             // use dup
@@ -191,15 +191,33 @@ int shellRedirection(job_info* job, char* line)
             exec_result = execvp(job->procs->cmd, job->procs->argv);
             if (exec_result < 0) 
             {  //Error checking
-            printf(EXEC_ERR, job->procs->cmd);
-            // Cleaning up to make Valgrind happy 
-            // (not necessary because child will exit. Resources will be reaped by parent)
-            free_job(job);  
-            free(line);
-            validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
-            exit(EXIT_FAILURE);
+                printf(EXEC_ERR, job->procs->cmd);
+                // Cleaning up to make Valgrind happy 
+                // (not necessary because child will exit. Resources will be reaped by parent)
+                free_job(job);  
+                free(line);
+                validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+                exit(EXIT_FAILURE);
             }  
-        }  
+        }
+        else
+        {
+			if(job->bg == 0)
+			{
+				*wait_result = waitpid(pid, exit_status, 0);
+				if (wait_result < 0) 
+				{
+					printf(WAIT_ERR);
+					exit(EXIT_FAILURE);
+				}
+			}
+        }
+        
+        if(job->bg == 0)
+		{
+			free_job(job);  // if a foreground job, we no longer need the data
+		}
+		free(line);  
     }
     else if(job->in_file != NULL)
     {
@@ -230,8 +248,8 @@ int shellRedirection(job_info* job, char* line)
             }
             if(fd1 < 0 || fd3 < 0)
             {
-                perror("file error");
-                exit(0);
+                fprintf(stderr, RD_ERR);
+                return -1;
             }
 
             dup2(fd1, 0);
@@ -242,15 +260,33 @@ int shellRedirection(job_info* job, char* line)
             exec_result = execvp(job->procs->cmd, job->procs->argv);
             if (exec_result < 0) 
             {  //Error checking
-            printf(EXEC_ERR, job->procs->cmd);
-            // Cleaning up to make Valgrind happy 
-            // (not necessary because child will exit. Resources will be reaped by parent)
-            free_job(job);  
-            free(line);
-            validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
-            exit(EXIT_FAILURE);
+                printf(EXEC_ERR, job->procs->cmd);
+                // Cleaning up to make Valgrind happy 
+                // (not necessary because child will exit. Resources will be reaped by parent)
+                free_job(job);  
+                free(line);
+                validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+                exit(EXIT_FAILURE);
             }           
         }
+        else
+        {
+			if(job->bg == 0)
+			{
+				*wait_result = waitpid(pid, exit_status, 0);
+				if (wait_result < 0) 
+				{
+					printf(WAIT_ERR);
+					exit(EXIT_FAILURE);
+				}
+			}
+        }
+
+        if(job->bg == 0)
+		{
+			free_job(job);  // if a foreground job, we no longer need the data
+		}
+		free(line);
 
     }
     else if(job->out_file != NULL)
@@ -283,8 +319,8 @@ int shellRedirection(job_info* job, char* line)
             }
             if(fd2 < 0 || fd3 < 0)
             {
-                perror("file error");
-                exit(0);
+                fprintf(stderr, RD_ERR);
+                return -1;
             }
 
             dup2(fd2, 1);
@@ -295,15 +331,33 @@ int shellRedirection(job_info* job, char* line)
             exec_result = execvp(job->procs->cmd, job->procs->argv);
             if (exec_result < 0) 
             {  //Error checking
-            printf(EXEC_ERR,  job->procs->cmd);
-            // Cleaning up to make Valgrind happy 
-            // (not necessary because child will exit. Resources will be reaped by parent)
-            free_job(job);  
-            free(line);
-            validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
-            exit(EXIT_FAILURE);
+                printf(EXEC_ERR,  job->procs->cmd);
+                // Cleaning up to make Valgrind happy 
+                // (not necessary because child will exit. Resources will be reaped by parent)
+                free_job(job);  
+                free(line);
+                validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+                exit(EXIT_FAILURE);
             }           
         }
+        else
+        {
+			if(job->bg == 0)
+			{
+				*wait_result = waitpid(pid, exit_status, 0);
+				if (wait_result < 0) 
+				{
+					printf(WAIT_ERR);
+					exit(EXIT_FAILURE);
+				}
+			}
+        }
+
+        if(job->bg == 0)
+		{
+			free_job(job);  // if a foreground job, we no longer need the data
+		}
+		free(line);
     }
     else if(job->procs->err_file != NULL)
     {
@@ -319,20 +373,43 @@ int shellRedirection(job_info* job, char* line)
         if(pid == 0)
         {
             fd3 = open(job->procs->err_file, O_RDONLY | O_CREAT);
+            if(fd3 < 0)
+            {
+                fprintf(stderr, RD_ERR);
+                return -1;
+            }
             dup2(fd3, 2);
             
             exec_result = execvp(job->procs->cmd, job->procs->argv);
             if (exec_result < 0) 
             {  //Error checking
-            printf(EXEC_ERR, job->procs->cmd);
-            // Cleaning up to make Valgrind happy 
-            // (not necessary because child will exit. Resources will be reaped by parent)
-            free_job(job);  
-            free(line);
-            validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
-            exit(EXIT_FAILURE);
+                printf(EXEC_ERR, job->procs->cmd);
+                // Cleaning up to make Valgrind happy 
+                // (not necessary because child will exit. Resources will be reaped by parent)
+                free_job(job);  
+                free(line);
+                validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+                exit(EXIT_FAILURE);
             }  
         }
+        else
+        {
+			if(job->bg == 0)
+			{
+				*wait_result = waitpid(pid, exit_status, 0);
+				if (wait_result < 0) 
+				{
+					printf(WAIT_ERR);
+					exit(EXIT_FAILURE);
+				}
+			}
+        }
+
+        if(job->bg == 0)
+		{
+			free_job(job);  // if a foreground job, we no longer need the data
+		}
+		free(line);
     }
     else
     {
