@@ -244,7 +244,7 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
             fd1 = open(job->in_file, O_RDONLY);
             if(job->procs->err_file != NULL)
             {
-                fd3 = open(job->procs->err_file, O_RDONLY | O_CREAT);
+                fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT);
             }
             if(fd1 < 0 || fd3 < 0)
             {
@@ -315,7 +315,7 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
             fd2 = open(job->out_file, O_WRONLY | O_CREAT);
             if(job->procs->err_file != NULL)
             {
-                fd3 = open(job->procs->err_file, O_RDONLY | O_CREAT);
+                fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT);
             }
             if(fd2 < 0 || fd3 < 0)
             {
@@ -372,7 +372,7 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
 
         if(pid == 0)
         {
-            fd3 = open(job->procs->err_file, O_RDONLY | O_CREAT);
+            fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT);
             if(fd3 < 0)
             {
                 fprintf(stderr, RD_ERR);
