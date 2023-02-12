@@ -66,7 +66,8 @@ void insertInOrder(List_t* list, void* valref) {
     new_node->value = valref;
     new_node->next = NULL;
 
-    if (list->comparator(new_node->value, (*head)->value) <= 0) {
+    if (list->comparator(new_node->value, (*head)->value) <= 0) 
+    {
         new_node->next = *head;
         *head = new_node;
     } 

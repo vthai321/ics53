@@ -463,19 +463,20 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
 
 void execute(char* line, pid_t pid, pid_t* wait_result, int* exec_result, int* exit_status, job_info* job)
 {
-    if (pid == 0) {  //If zero, then it's the child process
+    if (pid == 0) 
+    {  //If zero, then it's the child process
             	//get the first command in the job list
 		    proc_info* proc = job->procs;
 			*exec_result = execvp(proc->cmd, proc->argv);
-			if (*exec_result < 0) {  //Error checking
+			if (*exec_result < 0) 
+            {  //Error checking
 				printf(EXEC_ERR, proc->cmd);
 				
 				// Cleaning up to make Valgrind happy 
 				// (not necessary because child will exit. Resources will be reaped by parent)
 				free_job(job);  
 				free(line);
-    				validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
-
+    			validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -499,19 +500,91 @@ void execute(char* line, pid_t pid, pid_t* wait_result, int* exec_result, int* e
 		free(line); 
 }
 
-int doPipe(job_info* job, int* pid)
+void doPipe(job_info* job, int* pid, int* exec_result, int* exit_status, pid_t* wait_result, char* line)
 {
-    int pipefd[2] = {0,0}; // to store fd
-    if(pipe(pipefd) == -1)
-    {
-        return -1; // error, handle this outside the function
-    }
     // pipefd[0] is read fd
     // pipefd[1] is write fd
 
     //fork 2 times
     if(job->nproc == 2)
     {
+        int pipefd1[2]; // to store fd
+        if(pipe(pipefd1) == -1)
+        {
+            exit(EXIT_FAILURE); // placeholder
+        }
+        
+        if ((*pid = fork()) < 0) 
+		{
+			perror("fork error");
+			exit(EXIT_FAILURE);
+		}
+
+        if(*pid == 0)
+        {
+            close(pipefd1[0]);
+            dup2(pipefd1[1], 1); // copy the pipe into stdout 
+
+            proc_info* proc = job->procs;
+			*exec_result = execvp(proc->cmd, proc->argv);
+			if (*exec_result < 0) 
+            {  //Error checking
+				printf(EXEC_ERR, proc->cmd);
+				
+				// Cleaning up to make Valgrind happy 
+				// (not necessary because child will exit. Resources will be reaped by parent)
+				free_job(job);  
+				free(line);
+    			validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+				exit(EXIT_FAILURE);
+			}
+        }
+        else // as the parent
+        {
+            *wait_result = waitpid(*pid, exit_status, 0);
+            if (*wait_result < 0) 
+            {
+                printf(WAIT_ERR);
+                exit(EXIT_FAILURE);
+            }
+            
+            if ((*pid = fork()) < 0) 
+		    {
+			    perror("fork error");
+			    exit(EXIT_FAILURE);
+		    }
+
+            if(*pid == 0)
+            {
+                close(pipefd1[1]); // close write
+                dup2(pipefd1[0], 0); // change stdin
+                // note: for the arrow operator chaining below, we may need a helper function loop for infinite piping implementation
+                proc_info* proc = job->procs->next_proc;
+                *exec_result = execvp(proc->cmd, proc->argv);
+                if (*exec_result < 0) 
+                {  //Error checking
+                    printf(EXEC_ERR, proc->cmd);
+                    
+                    // Cleaning up to make Valgrind happy 
+                    // (not necessary because child will exit. Resources will be reaped by parent)
+                    free_job(job);  
+                    free(line);
+                    validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else
+            {
+                close(pipefd1[0]);
+                close(pipefd1[1]);
+                *wait_result = waitpid(*pid, exit_status, 0);
+                if (*wait_result < 0) 
+                {
+                    printf(WAIT_ERR);
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
 
     }
     else if(job->nproc == 3)

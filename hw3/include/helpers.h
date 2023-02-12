@@ -67,7 +67,7 @@ void execute(char* line, pid_t pid, pid_t* wait_result, int* exec_result, int* e
 /*
 Contains all the code for piping, so that the shell looks neater
 Parameters: job_info* job
-Return Values: An int for return status. 0 for Success
+Return Values: none
 */
-int doPipe(job_info* job, int* pid);
+void doPipe(job_info* job, int* pid, int* exec_result, int* exit_status, pid_t* wait_result, char* line);
 

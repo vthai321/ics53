@@ -99,8 +99,8 @@ int main(int argc, char* argv[]) {
 			// Terminating the shell
 			free(line);
 			free_job(job);
-            		validate_input(NULL);   // calling validate_input with NULL will free the memory it has allocated
-            		return 0;
+            validate_input(NULL);   // calling validate_input with NULL will free the memory it has allocated
+            return 0;
 		}
 
 		// built-in command to change directories
@@ -118,11 +118,15 @@ int main(int argc, char* argv[]) {
 					char cdBuff[500]; //inquire if this is necessary
 					char* absPath = getcwd(cdBuff, 500);
 					fprintf(stdout, "%s\n", absPath); 
+					free_job(job);
+					free(line);				
 					continue;
 				}
 				else
 				{
 					fprintf(stderr, DIR_ERR);
+					free_job(job);
+					free(line);	
 					continue;
 				}
 			}
@@ -134,10 +138,14 @@ int main(int argc, char* argv[]) {
 					char cdBuff[500]; //inquire if this is necessary
 					char* absPath = getcwd(cdBuff, 500);
 					fprintf(stdout, "%s\n", absPath); 
+					free_job(job);
+					free(line);	
 					continue;
 				}
 				else
 				{
+					free_job(job);
+					free(line);	
 					fprintf(stderr, DIR_ERR);
 					continue;
 				}
@@ -149,6 +157,8 @@ int main(int argc, char* argv[]) {
 		if(strcmp(job->procs->cmd, "estatus") == 0)
 		{
 			fprintf(stdout, "%d\n", WEXITSTATUS(exit_status)); // is it this easy
+			free_job(job);
+			free(line);
 			continue; 
 		}
 
@@ -162,6 +172,8 @@ int main(int argc, char* argv[]) {
 				print_bgentry((bgentry_t*)(bglistCurrent->value));
 				bglistCurrent = bglistCurrent->next;
 			}
+			free_job(job);
+			free(line);
 			continue;
 		}
 
@@ -190,6 +202,7 @@ int main(int argc, char* argv[]) {
 			newBgentry->seconds = time(NULL); 
 
 			// use the comparator to insert into the list (already makes the node)
+			// memory "leak" occurs because we technically lose the pointer to that node without freeing
 			insertInOrder(&bgentry_List, newBgentry);
 		}
 		
@@ -198,31 +211,34 @@ int main(int argc, char* argv[]) {
 		{
 			if(pid == 0)
 			{
-				//doPipe(job, &pid);
+				doPipe(job, &pid, &exec_result, &exit_status, &wait_result, line);
 			}
 			else
 			{		
 				if(job->bg == 0)
 				{
 					// wait for doPipe to finish
-					/*
 					wait_result = waitpid(pid, &exit_status, 0);
 					if (wait_result < 0) 
 					{
 						printf(WAIT_ERR);
 						exit(EXIT_FAILURE);
 					}
-					*/
+					
 				}
 			}
+			
 			if(job->bg == 0)
 			{
 				free_job(job);  // if a foreground job, we no longer need the data
+				free(line);
 			}
+			continue;
 		}
-
-		
-		execute(line, pid, &wait_result, &exec_result, &exit_status, job); // helper function to handle regular case of execvp
+		else
+		{
+			execute(line, pid, &wait_result, &exec_result, &exit_status, job); // helper function to handle regular case of execvp
+		}
 	}
     // calling validate_input with NULL will free the memory it has allocated
 	validate_input(NULL);
