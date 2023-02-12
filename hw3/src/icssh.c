@@ -48,19 +48,19 @@ int main(int argc, char* argv[]) {
 	}
 
     	// print the prompt & wait for the user to enter commands string
-	while ((line = readline(SHELL_PROMPT)) != NULL) {
-			// MAGIC HAPPENS! Command string is parsed into a job struct
-        	// Will print out error message if command string is invalid
+	while ((line = readline(SHELL_PROMPT)) != NULL) 
+	{
+		// MAGIC HAPPENS! Command string is parsed into a job struct
+		// Will print out error message if command string is invalid
 		job_info* job = validate_input(line);
-        	if (job == NULL) { // Command was empty string or invalid
-			free(line);
-			continue;
+		if (job == NULL) 
+		{ // Command was empty string or invalid
+		free(line);
+		continue;
 		}
 
 		// check if conditional flag for terminatedChild is set 
 		// reap all terminated background child processes, 1 at a time
-		// to reap a child, call waitpid() before exit()
-		// use pid to determine which process to terminate?
 		if(terminatedChild == 1)
 		{	
 			// while loop thru every node
@@ -82,19 +82,19 @@ int main(int argc, char* argv[]) {
 			}
 			terminatedChild = 0;
 		}
+
         	//Prints out the job linked list struture for debugging
         	#ifdef DEBUG   // If DEBUG flag removed in makefile, this will not longer print
             		debug_print_job(job);
         	#endif
 
+
 		// example built-in: exit
 		// for part 3: modify to kill ALL running background jobs before termination
 		// print BG_TERM, aim to use delete_list
-		// should be restricted to shell process, right? (ask to clarify)
 		if (strcmp(job->procs->cmd, "exit") == 0) 
 		{
 			// clear the bg process list and kill all bg processes
-			// todo, fix seg fault
 			terminateAll(&bgentry_List);
 			// Terminating the shell
 			free(line);
@@ -141,7 +141,6 @@ int main(int argc, char* argv[]) {
 					fprintf(stderr, DIR_ERR);
 					continue;
 				}
-
 			}
 		}
 
@@ -166,16 +165,16 @@ int main(int argc, char* argv[]) {
 			continue;
 		}
 
-		// part 4 
-		// insert shellRedirection() here
-		if(shellRedirection(job, line, &wait_result, &exit_status) != 69)
+		// part 4
+		if(shellRedirection(job, line, &wait_result, &exit_status, &bgentry_List) != 2)
 		{
-			continue; // we did something involving redirection (including errors)
+			continue; // in case of error, let us ask for another command to enter
 		}
 
 		// example of good error handling!
 		// the part where we fork
-		if ((pid = fork()) < 0) {
+		if ((pid = fork()) < 0) 
+		{
 			perror("fork error");
 			exit(EXIT_FAILURE);
 		}
@@ -193,40 +192,37 @@ int main(int argc, char* argv[]) {
 			// use the comparator to insert into the list (already makes the node)
 			insertInOrder(&bgentry_List, newBgentry);
 		}
-
-		// the part where we do jobs with parents and children (for fg?)
-		if (pid == 0) {  //If zero, then it's the child process
-            	//get the first command in the job list
-		    proc_info* proc = job->procs;
-			exec_result = execvp(proc->cmd, proc->argv);
-			if (exec_result < 0) {  //Error checking
-				printf(EXEC_ERR, proc->cmd);
-				
-				// Cleaning up to make Valgrind happy 
-				// (not necessary because child will exit. Resources will be reaped by parent)
-				free_job(job);  
-				free(line);
-    				validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
-
-				exit(EXIT_FAILURE);
-			}
-		} else {
-            		// As the parent, wait for the foreground job to finish
-			if(job->bg == 0)
+		
+		// part 5 goes here 
+		if(job->nproc > 1)
+		{
+			if(pid == 0)
 			{
-				wait_result = waitpid(pid, &exit_status, 0);
-				if (wait_result < 0) 
+				//doPipe(job, &pid);
+			}
+			else
+			{		
+				if(job->bg == 0)
 				{
-					printf(WAIT_ERR);
-					exit(EXIT_FAILURE);
+					// wait for doPipe to finish
+					/*
+					wait_result = waitpid(pid, &exit_status, 0);
+					if (wait_result < 0) 
+					{
+						printf(WAIT_ERR);
+						exit(EXIT_FAILURE);
+					}
+					*/
 				}
 			}
+			if(job->bg == 0)
+			{
+				free_job(job);  // if a foreground job, we no longer need the data
+			}
 		}
-		if(job->bg == 0)
-		{
-			free_job(job);  // if a foreground job, we no longer need the data
-		}
-		free(line);
+
+		
+		execute(line, pid, &wait_result, &exec_result, &exit_status, job); // helper function to handle regular case of execvp
 	}
     // calling validate_input with NULL will free the memory it has allocated
 	validate_input(NULL);

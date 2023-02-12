@@ -125,7 +125,7 @@ void terminateAll(List_t* list)
     // deleteList(list); not applicable to a static list
 }
 
-int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_status)
+int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_status, List_t *bgentry_List)
 {
     
     // part 4
@@ -162,7 +162,18 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
 			perror("fork error");
 			exit(EXIT_FAILURE);
 		}
+		
+        if(job->bg == 1 && pid != 0) // parent only 
+		{	
+			bgentry_t* newBgentry = malloc(sizeof(bgentry_t));
+			newBgentry->job = job;
+			newBgentry->pid = pid; 
+			newBgentry->seconds = time(NULL); 
 
+			// use the comparator to insert into the list (already makes the node)
+			insertInOrder(bgentry_List, newBgentry);
+		}
+        
         if(pid == 0)
         {
             // open the necessary files
@@ -239,6 +250,17 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
 			exit(EXIT_FAILURE);
 		}
 
+        if(job->bg == 1 && pid != 0) // parent only 
+		{	
+			bgentry_t* newBgentry = malloc(sizeof(bgentry_t));
+			newBgentry->job = job;
+			newBgentry->pid = pid; 
+			newBgentry->seconds = time(NULL); 
+
+			// use the comparator to insert into the list (already makes the node)
+			insertInOrder(bgentry_List, newBgentry);
+		}
+
         if(pid == 0)
         {
             fd1 = open(job->in_file, O_RDONLY);
@@ -310,6 +332,17 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
 			exit(EXIT_FAILURE);
 		}
 
+        if(job->bg == 1 && pid != 0) // parent only 
+		{	
+			bgentry_t* newBgentry = malloc(sizeof(bgentry_t));
+			newBgentry->job = job;
+			newBgentry->pid = pid; 
+			newBgentry->seconds = time(NULL); 
+
+			// use the comparator to insert into the list (already makes the node)
+			insertInOrder(bgentry_List, newBgentry);
+		}
+
         if(pid == 0)
         {
             fd2 = open(job->out_file, O_WRONLY | O_CREAT);
@@ -370,6 +403,17 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
 			exit(EXIT_FAILURE);
 		}
 
+        if(job->bg == 1 && pid != 0) // parent only 
+		{	
+			bgentry_t* newBgentry = malloc(sizeof(bgentry_t));
+			newBgentry->job = job;
+			newBgentry->pid = pid; 
+			newBgentry->seconds = time(NULL); 
+
+			// use the comparator to insert into the list (already makes the node)
+			insertInOrder(bgentry_List, newBgentry);
+		}
+
         if(pid == 0)
         {
             fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT);
@@ -390,7 +434,7 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
                 free(line);
                 validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
                 exit(EXIT_FAILURE);
-            }  
+            }
         }
         else
         {
@@ -413,7 +457,71 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
     }
     else
     {
-        return 69; // nothing done involving redirection
+        return 2;  // nothing done involving redirection
     }
-    return 0;
 }
+
+void execute(char* line, pid_t pid, pid_t* wait_result, int* exec_result, int* exit_status, job_info* job)
+{
+    if (pid == 0) {  //If zero, then it's the child process
+            	//get the first command in the job list
+		    proc_info* proc = job->procs;
+			*exec_result = execvp(proc->cmd, proc->argv);
+			if (*exec_result < 0) {  //Error checking
+				printf(EXEC_ERR, proc->cmd);
+				
+				// Cleaning up to make Valgrind happy 
+				// (not necessary because child will exit. Resources will be reaped by parent)
+				free_job(job);  
+				free(line);
+    				validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+
+				exit(EXIT_FAILURE);
+			}
+		}
+        else 
+        {
+            // As the parent, wait for the foreground job to finish
+			if(job->bg == 0)
+			{
+				*wait_result = waitpid(pid, exit_status, 0);
+				if (*wait_result < 0) 
+				{
+					printf(WAIT_ERR);
+					exit(EXIT_FAILURE);
+				}
+			}
+		}
+		if(job->bg == 0)
+		{
+			free_job(job);  // if a foreground job, we no longer need the data
+		}
+		free(line); 
+}
+
+int doPipe(job_info* job, int* pid)
+{
+    int pipefd[2] = {0,0}; // to store fd
+    if(pipe(pipefd) == -1)
+    {
+        return -1; // error, handle this outside the function
+    }
+    // pipefd[0] is read fd
+    // pipefd[1] is write fd
+
+    //fork 2 times
+    if(job->nproc == 2)
+    {
+
+    }
+    else if(job->nproc == 3)
+    {
+
+    }
+    else
+    {
+        //infinite piping goes here????
+    }
+
+}
+

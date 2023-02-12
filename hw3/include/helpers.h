@@ -51,10 +51,23 @@ Return Values: none
 void terminateAll(List_t* list);
 
 /*
-Handles the redirection portion of the shell
+Handles the redirection portion of the shell. 
 Parameters: job_info* job, the job struct where we get relevent data, char* line, the buffer for the command
 Return values: 0 on success, -1 on failure
 */
-int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_status);
+int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_status, List_t *bgentry_List); 
 
+/*
+Handles calling a command without piping or redirection.
+Parameters: char* line, pid_t pid, pid_t* wait_result, int* exec_result, int* exit_status job_info* job
+Return Values: none
+*/
+void execute(char* line, pid_t pid, pid_t* wait_result, int* exec_result, int* exit_status, job_info* job);
+
+/*
+Contains all the code for piping, so that the shell looks neater
+Parameters: job_info* job
+Return Values: An int for return status. 0 for Success
+*/
+int doPipe(job_info* job, int* pid);
 
