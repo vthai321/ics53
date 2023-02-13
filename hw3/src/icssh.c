@@ -7,7 +7,8 @@
 //int terminatedChild = 0;
 volatile sig_atomic_t terminatedChild = 0;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) 
+{
 	int exec_result;
 	int exit_status;
 	pid_t pid;
@@ -224,15 +225,14 @@ int main(int argc, char* argv[]) {
 						printf(WAIT_ERR);
 						exit(EXIT_FAILURE);
 					}
-					
 				}
 			}
 			
 			if(job->bg == 0)
 			{
 				free_job(job);  // if a foreground job, we no longer need the data
-				free(line);
 			}
+			free(line);
 			continue;
 		}
 		else

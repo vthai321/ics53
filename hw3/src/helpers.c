@@ -87,6 +87,7 @@ void sigusr2Handler(int sig)
     //below is not the most efficient way, but is practice using these functions
     int callerPid = (int)getpid();
     char myMsg[100];
+    memset(&myMsg, 0, 100);
 
     snprintf(myMsg, 50, "Hi User! I am process %d\n", callerPid);
     write(1, myMsg, 100);
@@ -122,7 +123,7 @@ void terminateAll(List_t* list)
             currentBGentry = (bgentry_t*)(current->value);
         }
     }
-    // deleteList(list); not applicable to a static list
+    deleteList(list); // might not work
 }
 
 int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_status, List_t *bgentry_List)
@@ -585,15 +586,129 @@ void doPipe(job_info* job, int* pid, int* exec_result, int* exit_status, pid_t* 
                 }
             }
         }
-
     }
     else if(job->nproc == 3)
     {
+        // fork 3 times
+        int pipefd1[2]; // pipe 1
+        int pipefd2[2]; // pipe 2
 
+        if(pipe(pipefd1) == -1)
+        {
+            exit(EXIT_FAILURE); // placeholder
+        }
+        
+        if(pipe(pipefd2) == -1)
+        {
+            exit(EXIT_FAILURE); // placeholder
+        }
+        
+        if ((*pid = fork()) < 0) 
+		{
+			perror("fork error");
+			exit(EXIT_FAILURE);
+		}
+
+        if(*pid == 0) // manager
+        {
+            
+            if ((*pid = fork()) < 0) 
+		    {
+			    perror("fork error");
+			    exit(EXIT_FAILURE);
+		    }
+
+            if(*pid == 0) // all children under care of manager
+            {
+                close(pipefd2[0]); // close pipe 2 
+                close(pipefd2[1]);
+                close(pipefd1[0]); // close read for pipe 1
+                dup2(pipefd1[1], 1); // copy the write for pipe 1 into stdout 
+
+                proc_info* proc = job->procs;
+                *exec_result = execvp(proc->cmd, proc->argv);
+                if (*exec_result < 0) 
+                {  //Error checking
+                    printf(EXEC_ERR, proc->cmd);
+                    
+                    // Cleaning up to make Valgrind happy 
+                    // (not necessary because child will exit. Resources will be reaped by parent)
+                    free_job(job);  
+                    free(line);
+                    validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else
+            {   
+                if ((*pid = fork()) < 0) 
+                {
+                    perror("fork error");
+                    exit(EXIT_FAILURE);
+                }
+                
+                if(*pid == 0)
+                {
+                    close(pipefd1[1]); // close write of pipe 1
+                    close(pipefd2[0]); // close read of pipe2
+                    dup2(pipefd2[1], 1); // change stdout to write of pipe 2 (for process C)
+                    dup2(pipefd1[0], 0); // change stdin to read of pipe 1 (from process A)
+                    // note: for the arrow operator chaining below, we may need a helper function loop for infinite piping implementation
+                    proc_info* proc = job->procs->next_proc;
+                    *exec_result = execvp(proc->cmd, proc->argv);
+                    if (*exec_result < 0) 
+                    {  //Error checking
+                        printf(EXEC_ERR, proc->cmd);
+                        
+                        // Cleaning up to make Valgrind happy 
+                        // (not necessary because child will exit. Resources will be reaped by parent)
+                        free_job(job);  
+                        free(line);
+                        validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+                        exit(EXIT_FAILURE);
+                    }
+                }
+                else
+                {
+                    close(pipefd1[0]); // close pipe 1
+                    close(pipefd1[1]);
+                    close(pipefd2[1]); // close write of pipe 2 
+                    dup2(pipefd2[0], 0); // change stdin to read of pipe 2
+                    // note: for the arrow operator chaining below, we may need a helper function loop for infinite piping implementation
+                    proc_info* proc = job->procs->next_proc->next_proc;
+                    *exec_result = execvp(proc->cmd, proc->argv);
+                    if (*exec_result < 0) 
+                    {  //Error checking
+                        printf(EXEC_ERR, proc->cmd);
+                        
+                        // Cleaning up to make Valgrind happy 
+                        // (not necessary because child will exit. Resources will be reaped by parent)
+                        free_job(job);  
+                        free(line);
+                        validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+                        exit(EXIT_FAILURE);
+                    }
+                }
+            }
+        }
+        else
+        {
+            close(pipefd1[0]);
+            close(pipefd1[1]);
+            close(pipefd2[0]);
+            close(pipefd2[1]);
+            *wait_result = waitpid(*pid, exit_status, 0);
+            if (*wait_result < 0) 
+            {
+                printf(WAIT_ERR);
+                exit(EXIT_FAILURE);
+            }
+        }
     }
     else
     {
-        //infinite piping goes here????
+        // infinite piping goes here
+        // if I get this to work it can replace the hard-coded segments for piping 2 or 3 processes
     }
 
 }
