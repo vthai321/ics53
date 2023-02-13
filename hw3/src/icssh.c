@@ -104,6 +104,15 @@ int main(int argc, char* argv[])
             return 0;
 		}
 
+		//built-in command to draw ascii art (extra credit)
+		if(strcmp(job->procs->cmd, "ascii53") == 0)
+		{
+			ascii53();
+			free_job(job);
+			free(line);
+			continue; 
+		}
+
 		// built-in command to change directories
 		// job is a job_info struct that contains metadata about job (entered line) and a list of the processes (procs)
 		// proc info works like a linked list; job points to its head

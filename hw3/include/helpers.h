@@ -71,3 +71,10 @@ Return Values: none
 */
 void doPipe(job_info* job, int* pid, int* exec_result, int* exit_status, pid_t* wait_result, char* line);
 
+/*
+Draws ascii art for the ascii53 command
+Parameters: none
+Return Values: none
+*/
+void ascii53();
+
