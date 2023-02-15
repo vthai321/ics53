@@ -1,6 +1,7 @@
 #include "helpers.h"
 #include "icssh.h"
 #include "linkedList.h"
+//#include <stdlib.h>
 
 // Your helper functions need to be here.
 int bGentryTime_Comparator(void* bGentryOne, void* bGentryTwo)
@@ -727,5 +728,43 @@ void ascii53()
             "   ///        ////               ///           ///              ///          *              *     \n"
             "//////////    /////////    /////////        ///            ////////           **************      \n"
           );
+}
+
+void setShellPrompt(char* shellPromptMoreInfo)
+{
+    //clear the string to process
+    shellPromptMoreInfo[0] = '\0';
+    
+    // shell
+	char shell[200] = "\x1B[1;34m";  // please change to array notation where we allocate enough space 
+    char* envShell = getenv("HOME"); // please change to array notation where we allocate enough space
+    if(envShell == NULL)
+    {
+        return; // dont change anything
+    }
+	strcat(shell, envShell);
+	// host name
+	char hostName[200] = "\x1B[0;35m";
+	char* envHostName = getenv("HOSTNAME");
+    if(envHostName == NULL)
+    {
+        return; // dont change anything
+    }
+	strcat(hostName, envHostName);
+	// path
+	char promptShell[200] = "\x1B[1;31m";
+	char* envPromptShell = getenv("SHELL");
+    if(envPromptShell == NULL)
+    {
+        return; // dont change anything
+    }
+	strcat(promptShell, envPromptShell);
+
+	char* endOfPrompt = "\x1B[1;32m<53shell>$ ";
+
+	strcat(shellPromptMoreInfo, shell);
+	strcat(shellPromptMoreInfo, hostName);
+	strcat(shellPromptMoreInfo, promptShell);
+	strcat(shellPromptMoreInfo, endOfPrompt);
 }
 

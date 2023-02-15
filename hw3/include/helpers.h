@@ -2,6 +2,8 @@
 #include "icssh.h"
 #include <signal.h>
 #include <unistd.h>
+#include <stdlib.h>
+
 
 // flag for terminated child (bg) (global) (should change to volatile sig_atomic t)
 //extern int terminatedChild;
@@ -77,4 +79,12 @@ Parameters: none
 Return Values: none
 */
 void ascii53();
+
+/*
+Sets shell prompt to one with more information if debug flag is present
+Meant for use inside preprocessor directive
+Parameters: char* shellPromptMoreInfo, which stores the string the function creates
+Return Values: none
+*/
+void setShellPrompt(char* shellPromptMoreInfo);
 

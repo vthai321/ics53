@@ -18,11 +18,14 @@
 #define PID_ERR "PROCESS ERROR: Process pid does not exist.\n"
 #define PIPE_ERR "PIPE ERROR: Invalid use of pipe operators.\n"
 
+// modify SHELL_PROMPT below for part 2 of extra credit
+
 #ifdef DEBUG
-#define SHELL_PROMPT "<53shell>$ "
+#define SHELL_PROMPT "\x1B[1;32m<53shell>$ "
 #else
-#define SHELL_PROMPT ""
+#define SHELL_PROMPT "<53shell>$ "
 #endif
+
 
 typedef struct proc_info {
 	char *err_file;               // name of file that stderr redirects to

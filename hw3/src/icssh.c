@@ -49,7 +49,18 @@ int main(int argc, char* argv[])
 	}
 
     	// print the prompt & wait for the user to enter commands string
-	while ((line = readline(SHELL_PROMPT)) != NULL) 
+	 
+	char shellPromptMoreInfo[200] = SHELL_PROMPT;
+	//shellPromptMoreInfo[0] = '\0';
+    // shell
+	//char* shell = "\x1B[1;34m";
+    //char* envShell = getenv("HOME");
+	//char* test = getenv("HOME");
+	#ifdef DEBUG
+		setShellPrompt(shellPromptMoreInfo);
+		//clear the string to process
+	#endif
+	while ((line = readline(shellPromptMoreInfo)) != NULL) 
 	{
 		// MAGIC HAPPENS! Command string is parsed into a job struct
 		// Will print out error message if command string is invalid
@@ -84,7 +95,8 @@ int main(int argc, char* argv[])
 			terminatedChild = 0;
 		}
 
-        	//Prints out the job linked list struture for debugging
+        	// Prints out the job linked list struture for debugging
+			// Will also come in handy for part 2 of extra credit 
         	#ifdef DEBUG   // If DEBUG flag removed in makefile, this will not longer print
             		debug_print_job(job);
         	#endif
