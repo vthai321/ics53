@@ -181,10 +181,10 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
             // open the necessary files
             // use bitwise | for multiple flags
             fd1 = open(job->in_file, O_RDONLY);
-            fd2 = open(job->out_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU); // creates file if needed
+            fd2 = open(job->out_file, O_WRONLY | O_CREAT | O_TRUNC, 0777); // creates file if needed
             if(job->procs->err_file != NULL)
             {
-                fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+                fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
             }
             if(fd1 < 0 || fd2 < 0 || fd3 < 0)
             {
@@ -268,7 +268,7 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
             fd1 = open(job->in_file, O_RDONLY);
             if(job->procs->err_file != NULL)
             {
-                fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+                fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
             }
             if(fd1 < 0 || fd3 < 0)
             {
@@ -347,10 +347,10 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
 
         if(pid == 0)
         {
-            fd2 = open(job->out_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+            fd2 = open(job->out_file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
             if(job->procs->err_file != NULL)
             {
-                fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+                fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
             }
             if(fd2 < 0 || fd3 < 0)
             {
@@ -419,7 +419,7 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
 
         if(pid == 0)
         {
-            fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+            fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
             if(fd3 < 0)
             {
                 fprintf(stderr, RD_ERR);
@@ -517,52 +517,29 @@ void doPipe(job_info* job, int* pid, int* exec_result, int* exit_status, pid_t* 
             exit(EXIT_FAILURE); // placeholder
         }
         
+        //fork for manager below
         if ((*pid = fork()) < 0) 
 		{
 			perror("fork error");
 			exit(EXIT_FAILURE);
 		}
 
-        if(*pid == 0)
+        if(*pid == 0) // manager
         {
-            close(pipefd1[0]);
-            dup2(pipefd1[1], 1); // copy the pipe into stdout 
 
-            proc_info* proc = job->procs;
-			*exec_result = execvp(proc->cmd, proc->argv);
-			if (*exec_result < 0) 
-            {  //Error checking
-				printf(EXEC_ERR, proc->cmd);
-				
-				// Cleaning up to make Valgrind happy 
-				// (not necessary because child will exit. Resources will be reaped by parent)
-				free_job(job);  
-				free(line);
-    			validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
-				exit(EXIT_FAILURE);
-			}
-        }
-        else // as the parent
-        {
-            *wait_result = waitpid(*pid, exit_status, 0);
-            if (*wait_result < 0) 
+            if ((*pid = fork()) < 0) 
             {
-                printf(WAIT_ERR);
+                perror("fork error");
                 exit(EXIT_FAILURE);
             }
-            
-            if ((*pid = fork()) < 0) 
-		    {
-			    perror("fork error");
-			    exit(EXIT_FAILURE);
-		    }
 
             if(*pid == 0)
             {
-                close(pipefd1[1]); // close write
-                dup2(pipefd1[0], 0); // change stdin
-                // note: for the arrow operator chaining below, we may need a helper function loop for infinite piping implementation
-                proc_info* proc = job->procs->next_proc;
+                close(pipefd1[0]);
+                dup2(pipefd1[1], 1); // copy the pipe into stdout 
+                close(pipefd1[1]);
+
+                proc_info* proc = job->procs;
                 *exec_result = execvp(proc->cmd, proc->argv);
                 if (*exec_result < 0) 
                 {  //Error checking
@@ -576,17 +553,53 @@ void doPipe(job_info* job, int* pid, int* exec_result, int* exit_status, pid_t* 
                     exit(EXIT_FAILURE);
                 }
             }
-            else
+            else // other process
             {
-                close(pipefd1[0]);
-                close(pipefd1[1]);
+                /*
                 *wait_result = waitpid(*pid, exit_status, 0);
                 if (*wait_result < 0) 
                 {
                     printf(WAIT_ERR);
                     exit(EXIT_FAILURE);
                 }
+                
+                if ((*pid = fork()) < 0) 
+                {
+                    perror("fork error");
+                    exit(EXIT_FAILURE);
+                }
+                */
+                
+                    close(pipefd1[1]); // close write
+                    dup2(pipefd1[0], 0); // change stdin
+                    close(pipefd1[0]);
+                    // note: for the arrow operator chaining below, we may need a helper function loop for infinite piping implementation
+                    proc_info* proc = job->procs->next_proc;
+                    *exec_result = execvp(proc->cmd, proc->argv);
+                    if (*exec_result < 0) 
+                    {  //Error checking
+                        printf(EXEC_ERR, proc->cmd);
+                        
+                        // Cleaning up to make Valgrind happy 
+                        // (not necessary because child will exit. Resources will be reaped by parent)
+                        free_job(job);  
+                        free(line);
+                        validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
+                        exit(EXIT_FAILURE);
+                    }
             }
+        }    
+        else
+        {
+            close(pipefd1[0]);
+            close(pipefd1[1]);
+            *wait_result = waitpid(*pid, exit_status, 0);
+            if (*wait_result < 0) 
+            {
+                printf(WAIT_ERR);
+                exit(EXIT_FAILURE);
+            }
+            exit(0);
         }
     }
     else if(job->nproc == 3)
@@ -705,12 +718,27 @@ void doPipe(job_info* job, int* pid, int* exec_result, int* exit_status, pid_t* 
                 printf(WAIT_ERR);
                 exit(EXIT_FAILURE);
             }
+            exit(0);
         }
     }
     else
     {
         // infinite piping goes here
         // if I get this to work it can replace the hard-coded segments for piping 2 or 3 processes
+        /*
+        int pipefd1[2];
+        int pipefd2[2];
+
+        proc_info* proc = job->procs;
+        while(proc != NULL)
+        {
+
+            proc = proc->next_proc;
+        }
+
+        */
+
+
     }
 
 } 
