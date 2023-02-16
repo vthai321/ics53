@@ -181,15 +181,15 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
             // open the necessary files
             // use bitwise | for multiple flags
             fd1 = open(job->in_file, O_RDONLY);
-            fd2 = open(job->out_file, O_WRONLY | O_CREAT); // creates file if needed
+            fd2 = open(job->out_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU); // creates file if needed
             if(job->procs->err_file != NULL)
             {
-                fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT);
+                fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
             }
             if(fd1 < 0 || fd2 < 0 || fd3 < 0)
             {
                 fprintf(stderr, RD_ERR);
-                return -1;
+                exit(EXIT_FAILURE);
             }
 
             // use dup
@@ -268,12 +268,12 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
             fd1 = open(job->in_file, O_RDONLY);
             if(job->procs->err_file != NULL)
             {
-                fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT);
+                fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
             }
             if(fd1 < 0 || fd3 < 0)
             {
                 fprintf(stderr, RD_ERR);
-                return -1;
+                exit(EXIT_FAILURE);
             }
 
             dup2(fd1, 0);
@@ -347,15 +347,16 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
 
         if(pid == 0)
         {
-            fd2 = open(job->out_file, O_WRONLY | O_CREAT);
+            fd2 = open(job->out_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
             if(job->procs->err_file != NULL)
             {
-                fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT);
+                fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
             }
             if(fd2 < 0 || fd3 < 0)
             {
                 fprintf(stderr, RD_ERR);
-                return -1;
+                perror("fileDBad");
+                exit(EXIT_FAILURE);
             }
 
             dup2(fd2, 1);
@@ -418,11 +419,11 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
 
         if(pid == 0)
         {
-            fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT);
+            fd3 = open(job->procs->err_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
             if(fd3 < 0)
             {
                 fprintf(stderr, RD_ERR);
-                return -1;
+                exit(EXIT_FAILURE);
             }
             dup2(fd3, 2);
             
@@ -766,5 +767,7 @@ void setShellPrompt(char* shellPromptMoreInfo)
 	strcat(shellPromptMoreInfo, hostName);
 	strcat(shellPromptMoreInfo, promptShell);
 	strcat(shellPromptMoreInfo, endOfPrompt);
+
+    strcat(shellPromptMoreInfo, "\x1B[0m");
 }
 

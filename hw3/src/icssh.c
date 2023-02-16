@@ -51,14 +51,8 @@ int main(int argc, char* argv[])
     	// print the prompt & wait for the user to enter commands string
 	 
 	char shellPromptMoreInfo[200] = SHELL_PROMPT;
-	//shellPromptMoreInfo[0] = '\0';
-    // shell
-	//char* shell = "\x1B[1;34m";
-    //char* envShell = getenv("HOME");
-	//char* test = getenv("HOME");
 	#ifdef DEBUG
 		setShellPrompt(shellPromptMoreInfo);
-		//clear the string to process
 	#endif
 	while ((line = readline(shellPromptMoreInfo)) != NULL) 
 	{
@@ -202,6 +196,7 @@ int main(int argc, char* argv[])
 		// part 4
 		if(shellRedirection(job, line, &wait_result, &exit_status, &bgentry_List) != 2)
 		{
+			// need to fix "double exit required" bug here
 			continue; // in case of error, let us ask for another command to enter
 		}
 
