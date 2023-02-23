@@ -1,6 +1,7 @@
 #include "helpers.h"
 #include "icssh.h"
 #include "linkedList.h"
+#include <stdio.h>
 //#include <stdlib.h>
 
 // Your helper functions need to be here.
@@ -193,8 +194,8 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
             }
 
             // use dup
-            dup2(fd2, 1); // stdout now refers to output file
-            dup2(fd1, 0); // stdin now refers to input file
+            dup2(fd2, STDOUT_FILENO); // stdout now refers to output file
+            dup2(fd1, STDIN_FILENO); // stdin now refers to input file
             if(job->procs->err_file != NULL)
             {
                 dup2(fd3, 2);
@@ -211,7 +212,8 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
                 free(line);
                 validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
                 exit(EXIT_FAILURE);
-            }  
+            }
+            exit(0);
         }
         else
         {
@@ -292,6 +294,11 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
                 validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
                 exit(EXIT_FAILURE);
             }           
+            close(fd1);
+            if(job->procs->err_file != NULL)
+            {
+                close(fd3);
+            }              
         }
         else
         {
@@ -374,7 +381,12 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
                 free(line);
                 validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
                 exit(EXIT_FAILURE);
-            }           
+            }
+            close(fd2);
+            if(job->procs->err_file != NULL)
+            {
+                close(fd3);
+            }             
         }
         else
         {
@@ -438,6 +450,10 @@ int shellRedirection(job_info* job, char* line, pid_t *wait_result, int *exit_st
                 validate_input(NULL);  // calling validate_input with NULL will free the memory it has allocated
                 exit(EXIT_FAILURE);
             }
+            if(job->procs->err_file != NULL)
+            {
+                close(fd3);
+            }  
         }
         else
         {
@@ -484,7 +500,7 @@ void execute(char* line, pid_t pid, pid_t* wait_result, int* exec_result, int* e
 			}
 		}
         else 
-        {
+        { 
             // As the parent, wait for the foreground job to finish
 			if(job->bg == 0)
 			{

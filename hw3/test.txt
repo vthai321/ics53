@@ -1,8 +1,0 @@
-Makefile
-bin
-hw3_vqthai.tar
-include
-lib
-rsrc
-src
-test.txt
