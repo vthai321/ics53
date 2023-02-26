@@ -8,7 +8,7 @@
  * The number of pages currently allocated is tracked using the variable below.
 */
 int numOfPages = 0;
-
+ 
 /*
  * The allocator MUST store the head of its free list in this variable. 
  * Doing so will make it accessible via the extern keyword.
@@ -30,20 +30,19 @@ ics_free_header *freelist_head = NULL;
  * an invalid request.
  */
 void *ics_malloc(size_t size) 
-{ 
-    // for the very first malloc call, we will need to obtain 1 page to jumpstart our allocator
-    // move this conditional below to a helper function.
-    // must account for case with no pages because the amount we can allocate also depends on our init header and footer
-    if(numOfPages == 0)
+{
+    /*
+    * pointer for tracking current page
+    */
+    void* currentPage = ics_get_brk();
+    
+    ics_free_header *currentBlock = freelist_head;
+    while(currentBlock != NULL)
     {
-        ics_inc_brk(1);
+
     }
-
-    // block size is stored in the header 
-    // allocate a new page if none of our free blocks have the space to store the request
-    
-
-    
+    // we ran out of usable blocks and require a new page
+    pagesNeeded(size, &numOfPages, currentPage, freelist_head);
     return NULL;
 }
 
