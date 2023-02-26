@@ -35,14 +35,15 @@ void *ics_malloc(size_t size)
     * pointer for tracking current page
     */
     void* currentPage = ics_get_brk();
-    
-    ics_free_header *currentBlock = freelist_head;
-    while(currentBlock != NULL)
+    ics_free_header *currentList = freelist_head;
+    while(currentList != NULL)
     {
 
     }
     // we ran out of usable blocks and require a new page
     pagesNeeded(size, &numOfPages, currentPage, freelist_head);
+    // use the new page (no loop necessary)
+    
     return NULL;
 }
 
