@@ -7,7 +7,6 @@
 /*
  * The number of pages currently allocated is tracked using the variable below.
 */
-int numOfPages = 0;
  
 /*
  * The allocator MUST store the head of its free list in this variable. 
@@ -31,36 +30,61 @@ ics_free_header *freelist_head = NULL;
  */
 void *ics_malloc(size_t size) 
 {
+    int numOfPages = 0;
     // void* pointer for tracking current page
     void* currentPage = ics_get_brk();
-    
     // void* pointer to return allocated space
     void* mallocBlock = NULL;
-
-    ics_free_header *currentListBlock = freelist_head;
-    while(pagesNeeded(size, &numOfPages, currentPage, freelist_head) != -1)
+    size_t mallocBlockSize = 0;
+    if(size > 16)
     {
+        mallocBlockSize = size + 16;
+    }
+    else
+    {
+        mallocBlockSize = 32;
+    }
+
+    while(pagesNeeded(size, &numOfPages, &currentPage, &freelist_head) != -1)
+    {
+        ics_free_header* currentListBlock = freelist_head;
         while(currentListBlock != NULL)
         {
-            size_t currentBlockSize = currentListBlock->header.block_size;
+            size_t currentBlockSize = ((ics_free_header*)currentListBlock)->header.block_size;
+            printf("current block size: %ld\n", currentBlockSize);
             // don't forget to account for case of splinters (payload < 16 or block size < 32)
-            if(currentBlockSize >= size)
+            if(currentBlockSize >= mallocBlockSize)
             {
                 //split block if our old block remains >32 bytes in size; otherwise, pad it
-                size_t mallocBlockDifference = currentBlockSize - size;
+                size_t mallocBlockDifference = currentBlockSize - mallocBlockSize;
                 if(mallocBlockDifference >= 32)
                 {
                     // case 1: we can split the old block
-                    mallocBlock = currentListBlock + 8; 
-                    return mallocBlock; // placeholder
+                    mallocBlock = (char*)currentListBlock + 8;
+                    void* currentListBlockFooter = (char*)currentListBlock + (currentBlockSize - 8);
+                    ((ics_free_header*)currentListBlock)->header.block_size = mallocBlockSize;
+                    ((ics_footer*)currentListBlockFooter)->block_size -= mallocBlockSize;
+
+                    // create the new header and footer
+                    void* newHeader = currentListBlock + mallocBlockSize;
+                    void* newFooter = currentListBlock + mallocBlockSize - 8;
+
+                    ((ics_free_header*)newHeader)->header.block_size = ((ics_footer*)currentListBlockFooter)->block_size;
+                    ((ics_free_header*)newHeader)->header.hid = HEADER_MAGIC;
+                    ((ics_free_header*)newHeader)->header.padding_amount = 0;
+
+                    ((ics_footer*)newFooter)->block_size = mallocBlockSize;
+                    ((ics_footer*)newFooter)->fid = FOOTER_MAGIC;
+                    return mallocBlock;
 
                 }
                 else
                 {
                     //case 2: use up the entire block and pad as needed. Padding value in header = mallocBlockDifference
-                    mallocBlock = currentListBlock + 8; // point to first byte of payload?
-                    removeFromList(currentListBlock, freelist_head);
-                    currentListBlock->header.padding_amount = mallocBlockDifference;
+                    mallocBlock = (char*)currentListBlock + 8; // point to first byte of payload?
+                    ics_free_header* blockToRemove = (ics_free_header*)currentListBlock;
+                    removeFromList(&blockToRemove, &freelist_head);
+                    ((ics_free_header*)currentListBlock)->header.padding_amount = mallocBlockSize - size;
                     return mallocBlock;
                 }
             }
@@ -68,7 +92,7 @@ void *ics_malloc(size_t size)
         }
     }
     return NULL; 
-    // to do: set errno to ENOMEM
+    // to do: set errno to ENOMEM?
 }
 
 /*
