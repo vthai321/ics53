@@ -31,20 +31,44 @@ ics_free_header *freelist_head = NULL;
  */
 void *ics_malloc(size_t size) 
 {
-    /*
-    * pointer for tracking current page
-    */
+    // void* pointer for tracking current page
     void* currentPage = ics_get_brk();
-    ics_free_header *currentList = freelist_head;
-    while(currentList != NULL)
-    {
-
-    }
-    // we ran out of usable blocks and require a new page
-    pagesNeeded(size, &numOfPages, currentPage, freelist_head);
-    // use the new page (no loop necessary)
     
-    return NULL;
+    // void* pointer to return allocated space
+    void* mallocBlock = NULL;
+
+    ics_free_header *currentListBlock = freelist_head;
+    while(pagesNeeded(size, &numOfPages, currentPage, freelist_head) != -1)
+    {
+        while(currentListBlock != NULL)
+        {
+            size_t currentBlockSize = currentListBlock->header.block_size;
+            // don't forget to account for case of splinters (payload < 16 or block size < 32)
+            if(currentBlockSize >= size)
+            {
+                //split block if our old block remains >32 bytes in size; otherwise, pad it
+                size_t mallocBlockDifference = currentBlockSize - size;
+                if(mallocBlockDifference >= 32)
+                {
+                    // case 1: we can split the old block
+                    mallocBlock = currentListBlock + 8; 
+                    return mallocBlock; // placeholder
+
+                }
+                else
+                {
+                    //case 2: use up the entire block and pad as needed. Padding value in header = mallocBlockDifference
+                    mallocBlock = currentListBlock + 8; // point to first byte of payload?
+                    removeFromList(currentListBlock, freelist_head);
+                    currentListBlock->header.padding_amount = mallocBlockDifference;
+                    return mallocBlock;
+                }
+            }
+            currentListBlock = currentListBlock->next;
+        }
+    }
+    return NULL; 
+    // to do: set errno to ENOMEM
 }
 
 /*
