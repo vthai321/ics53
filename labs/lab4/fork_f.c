@@ -4,19 +4,15 @@
 #include <unistd.h>
 
 int main() {
-  if (fork() == 0) 
-  {
+  if (fork() == 0) {
     /*this is the child*/
-    while (1) 
-    {
-        printf("Running child : ID=%d\n", getpid());
-        sleep(10);
-    }
-
+    printf("Terminating child : PID=%d\n", getpid());
+    exit(0);
   }
 
   /* parent code */
-    printf("Terminating child : PID=%d\n", getpid());
-    exit(0);
-
+  while (1) {
+    printf("Running parent : PID=%d\n", getpid());
+    sleep(10);
+  }
 }

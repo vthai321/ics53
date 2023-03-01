@@ -27,22 +27,12 @@ int main() {
   }
 
   /* parent code */
-  // note it's possible for the code to get here first (parent gets operated on first)
-  // then with the wait call, it would then be the child's turn to get worked on 
   printf("parent : str= %s\n", str);
 
   while (wait(status) > 0) {
     printf("After child terminated\n");
     printf("parent : str= %s\n", str);
   }
-
-  // child before: ABCDEFG 
-  // child after: abcdefg
-
-  // parent before: ABCDEFG
-  // parent after ABCDEFG
-
-  // parent and child do not share the same memory
 
   exit(0);
 }

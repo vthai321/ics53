@@ -28,9 +28,4 @@ int main() {
   }
 
   exit(0);
-
-  // i expect the output to be the same as what's in the file
-
-  // it got stuck, I think because sharing the same stream led to both processes unable to reach the end
-
 }

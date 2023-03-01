@@ -18,11 +18,4 @@ int main() {
   printf("parent : x=%d\n", --x);
 
   exit(0);
-
-  // expected x for child: 11
-
-  // expected x for parent: 9
-
-  // same as actual
-
 }
