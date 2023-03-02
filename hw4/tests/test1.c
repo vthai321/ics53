@@ -50,8 +50,10 @@ int main(int argc, char *argv[]) {
   printf("=== Test1: Allocation test ===\n");
   // Test #1: Allocate an integer
   // Test #1.1: Allocate 773 bytes
-  int *value1 = ics_malloc(773);
-  //null_check(value1, sizeof(int));
+  //int *value1 = ics_malloc(sizeof(7773));
+  int *value1 = ics_malloc(sizeof(int));
+  null_check(value1, sizeof(int));
+  //null_check(value1, 7737);
   payload_check(value1);
   ics_payload_print((void*)value1);
   ics_freelist_print();
@@ -98,7 +100,9 @@ int main(int argc, char *argv[]) {
   void *memory = ics_malloc(8192);
   ics_freelist_print();
   press_to_cont();
+  /*
   ics_free(memory);
+  */
   ics_freelist_print();
   press_to_cont();
 

@@ -4,16 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/*
- * The number of pages currently allocated is tracked using the variable below.
-*/
- 
-/*
+
+ /*
  * The allocator MUST store the head of its free list in this variable. 
  * Doing so will make it accessible via the extern keyword.
  * This will allow ics_freelist_print to access the value from a different file.
  */
 ics_free_header *freelist_head = NULL;
+
+void* bottomOfHeap = NULL;
 int numOfPages = 0;
 
 /*
@@ -31,12 +30,17 @@ int numOfPages = 0;
  */
 void *ics_malloc(size_t size) 
 {
-    // void* pointer for tracking current page
-    void* currentPage = ics_get_brk();
+    if(size < 0 || size > 24576)
+    {
+        return NULL;
+        errno = ENOMEM;
+    }
     // void* pointer to return allocated space
     void* mallocBlock = NULL;
+    void* currentPage = NULL;
     size_t mallocBlockSize = 0;
-    size_t calcPadding = 0; // go back later and implement this in the other part of function
+    size_t calcPadding = 0; 
+    
     if(size > 16)
     {
         int remainderSize = size % 16;
@@ -55,88 +59,34 @@ void *ics_malloc(size_t size)
         mallocBlockSize = 32;
         calcPadding = 16 - size;
     }
-
-    while(pagesNeeded(size, &numOfPages, &currentPage, &freelist_head) != -1)
+    
+    if(numOfPages == 0)
     {
-        ics_freelist_print();
-        
-        ics_free_header* currentListBlock = freelist_head;
-        while(currentListBlock != NULL)
-        {
-            size_t currentBlockSize = ((ics_free_header*)currentListBlock)->header.block_size;
-            size_t currentListBlockPayload = currentBlockSize - 16;
-            size_t mallocBlockDifference = currentBlockSize - mallocBlockSize;
-            // don't forget to account for case of splinters (payload < 16 or block size < 32)
-            if(currentBlockSize >= mallocBlockSize) // be careful w/ size_t arithmetic
-            {
-                //split block if our old block remains >32 bytes in size; otherwise, pad it
-                if(mallocBlockDifference >= 32)
-                {
-                    // case 1: we can split the old block
-                    printf("case 1\n");
-                    mallocBlock = (char*)currentListBlock + 8;
-                    void* currentListBlockFooterAddress = (char*)currentListBlock + (currentBlockSize - 8);
-                    ics_footer* currentListBlockFooter = (ics_footer*)currentListBlockFooterAddress;
-                    //printf("ACTUAL FOOTER ADDRESS CALCULATED: %p\n", currentListBlockFooterAddress);
-
-                    (currentListBlock)->header.block_size = mallocBlockSize;
-                    (currentListBlockFooter)->block_size -= mallocBlockSize;
-
-                    // create the new header and footer
-                    printf("mallocBlockSize: %lo\n", mallocBlockSize);
-                    
-                    void* newHeaderAddress = (char*)currentListBlock + mallocBlockSize;
-                    void* newFooterAddress = (char*)currentListBlock + mallocBlockSize - 8;
-                    ics_free_header* newHeader = (ics_free_header*)newHeaderAddress;
-                    ics_footer* newFooter = (ics_footer*)newFooterAddress;
-
-                    (newHeader)->header.block_size = (currentListBlockFooter)->block_size;
-                    (newHeader)->header.hid = HEADER_MAGIC;
-                    (newHeader)->header.padding_amount = 0;
-
-                    (newFooter)->block_size = mallocBlockSize;
-                    (newFooter)->fid = FOOTER_MAGIC;
-
-                    // add this new split block to head of freelist
-                    freelist_head->prev = newHeader;
-                    newHeader->next = freelist_head;
-                    newHeader->prev = NULL;
-                    freelist_head = newHeader;
-
-                    //use bitwise OR on the old header and new footer
-                     currentListBlock->header.block_size  = currentListBlock->header.block_size | 1;
-                     newFooter->block_size  = newFooter->block_size | 1;
-                    
-                    //calculate padding as needed
-                    //currentListBlock->header.padding_amount = currentListBlock->header.block_size - 16 - size - 1;
-                    currentListBlock->header.padding_amount = calcPadding;
-                    removeFromList(&currentListBlock, &freelist_head);
-                    //printf("freelist_head address after removal of old block: %p\n", freelist_head);
-
-                    return mallocBlock;
-                }
-                else if(mallocBlockDifference < 32)
-                {
-                    //printf("case2\n");
-                    //case 2: use up the entire block and pad as needed. Padding value in header = mallocBlockDifference
-                    mallocBlock = (char*)currentListBlock + 8; // point to first byte of payload?
-                    void* currentListBlockFooterAddress = (char*)currentListBlock + (currentBlockSize - 8);
-                    ics_footer* currentListBlockFooter = (ics_footer*)currentListBlockFooterAddress;
-                    removeFromList(&currentListBlock, &freelist_head);
-                    //perform bitwise OR 
-                    currentListBlock->header.block_size = currentListBlock->header.block_size | 1;
-                    currentListBlockFooter->block_size = currentListBlockFooter->block_size | 1;
-
-                    //currentListBlock->header.padding_amount = currentListBlock->header.block_size - 16 - size - 1;
-                    currentListBlock->header.padding_amount = calcPadding;
-                    return mallocBlock;
-                }
-            }
-            // should be reached if currentBlockSize payload is too small to accomodate request 
-            currentListBlock = currentListBlock->next;
-        }
+        pagesNeeded(size, &numOfPages, &currentPage, &freelist_head, &bottomOfHeap, mallocBlockSize);
     }
-    return NULL; 
+    ics_free_header* currentListBlock = freelist_head;
+    //debug
+    printf("DEBUG STATEMENT1 BELOW\n");
+    ics_freelist_print();
+    
+    mallocBlock = loopThroughList(currentListBlock, calcPadding, mallocBlockSize);
+    int pagesNeededResult = 0;
+    
+    while(mallocBlock == NULL)
+    {
+        printf("DEBUG STATEMENT2 BELOW\n");
+        ics_freelist_print();
+        pagesNeededResult = pagesNeeded(size, &numOfPages, &currentPage, &freelist_head, &bottomOfHeap, mallocBlockSize);
+        if(pagesNeededResult == -1)
+        {
+            return NULL;
+            // set errno
+        }
+        currentListBlock = freelist_head;   
+        mallocBlock = loopThroughList(currentListBlock, calcPadding, mallocBlockSize);
+    }
+    
+    return mallocBlock;
     // to do: set errno to ENOMEM? 
 }
 
@@ -152,7 +102,84 @@ void *ics_malloc(size_t size)
  */
 int ics_free(void *ptr) 
 { 
-    return -99999;
+    void* headerOfBlockAddress = ptr - 8;
+    ics_header* headerOfBlock = (ics_header*)headerOfBlockAddress;
+    size_t headerSize = headerOfBlock->block_size;
+    
+    void* footerOfBlockAddress = headerOfBlockAddress + (headerSize - 1) - 8;
+    ics_footer* footerOfBlock = (ics_footer*)footerOfBlockAddress;
+    size_t footerSize = footerOfBlock->block_size;
+    
+    void* brkLocation = ics_get_brk();
+    // alloc bit is set of block size is ODD; if even is a mistake
+    // below is a set of error checking if statements
+    // don't forget to set errno
+    
+    if(headerSize % 2 == 0 || footerSize % 2 ==0)
+    {
+        //set errno
+        errno = EINVAL;
+        return -1;
+    }
+    else if(ptr >= brkLocation || ptr < bottomOfHeap) // bottomOfHeap was intitialized in first call to ics_malloc()
+    {
+        errno = EINVAL;
+        return -1;
+    }
+    else if(headerSize != footerSize)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+    else if(headerOfBlock->hid != HEADER_MAGIC || footerOfBlock->fid != FOOTER_MAGIC)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    // free the block
+    headerOfBlock->block_size -= 1;
+    footerOfBlock->block_size -=1;
+
+    //TODO: check adjacent blocks in memory (via header or footer) to coalesce
+    // case 2: higher address (look at header of next block)
+    // if the next block is free, remove that block from the freelist
+
+    void* nextBlockHeaderAddress = footerOfBlockAddress + 8;
+    ics_free_header* nextBlockHeader = (ics_free_header*)nextBlockHeaderAddress;
+    int nextBlockSize = nextBlockHeader->header.block_size;
+
+    void* nextBlockFooterAddress = nextBlockHeaderAddress + (nextBlockSize - 8);
+    ics_footer* nextBlockFooter = (ics_footer*)nextBlockFooterAddress;
+
+    if(nextBlockSize % 2 == 0)
+    {
+        //coalesce
+        removeFromList(nextBlockHeader, &freelist_head);
+        size_t newBlockSize = nextBlockSize + headerOfBlock->block_size;
+        // update the header of the block freed by free() and the existing footer of next block
+        headerOfBlock->block_size = newBlockSize;
+        nextBlockFooter->block_size = newBlockSize;
+        // can ignore the middle parts
+    }
+
+    //insert it back into the free list
+    ics_free_header* freeHeader = (ics_free_header*)headerOfBlockAddress;
+    if(freelist_head == NULL)
+    {
+        freeHeader->next = NULL;
+        freeHeader->prev = NULL;
+        freelist_head = freeHeader;
+    }
+    else
+    {
+        freeHeader->next = freelist_head;
+        freeHeader->prev = NULL;
+        freelist_head->prev = freeHeader;
+        freelist_head = freeHeader;
+    }
+
+    return 0;
 }
 
 /********************** EXTRA CREDIT ***************************************/

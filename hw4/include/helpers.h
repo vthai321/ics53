@@ -17,7 +17,7 @@ extern int numOfPages;
     ics_free_header** freelist_head, a pointer to the pointer of head of list of free blocks
     Return value: 0 on success, -1 on failure
 */
-int pagesNeeded(size_t size, int* numOfPages, void** currentPage, ics_free_header** freelist_head);
+int pagesNeeded(size_t size, int* numOfPages, void** currentPage, ics_free_header** freelist_head, void** bottomOfHeap, size_t mallocBlockSize);
 
 /*
     Removes a free block from the freelist, using a process akin to removal of a node from a doubly linked list
@@ -25,6 +25,8 @@ int pagesNeeded(size_t size, int* numOfPages, void** currentPage, ics_free_heade
     ics_free_header* freelist_head, pointer to head of the free list
     Return value: 0 on success
 */
-int removeFromList(ics_free_header** currentListBlock, ics_free_header** freelist_head);
+int removeFromList(ics_free_header* currentListBlock, ics_free_header** freelist_head);
+
+void* loopThroughList(ics_free_header* currentListBlock, size_t calcPadding, size_t mallocBlockSize);
 
 #endif
