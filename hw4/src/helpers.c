@@ -95,10 +95,59 @@ int pagesNeeded(size_t size, int* numOfPages, void** currentPage, ics_free_heade
         else
         {
             // first page will store 4080, middle pages store 4096, last pages store 4080
-            
-
-            
+            int blockSizeDifference = mallocBlockSize - (8168); // case of 2 pages
+            int numOfMidPages = 0;
         }
+    }
+    else
+    {
+        *currentPage = ics_inc_brk(1);
+        if(*currentPage == (void*)-1)
+        {
+            return -1;
+        }
+        (*numOfPages)++;
+        //availableSize += 4088;
+        
+        // retrieve relevant addresses
+        void* beforeCurrentPageAddress = (*currentPage) - 8; // for header
+        ics_free_header* beforeCurrentPage = (ics_free_header*)beforeCurrentPageAddress;
+        
+        void* endOfPageAddress = ics_get_brk() - 8; // for epilogue
+        ics_footer* endOfPage = (ics_footer*)endOfPageAddress;
+        
+        void* endOfPageFooterAddress = endOfPageAddress - 8; // for footer
+        ics_footer* endOfPageFooter = (ics_footer*)endOfPageFooterAddress;
+
+        // create a new free block
+        // epilogue becomes header
+        beforeCurrentPage->header.block_size = 4096; // check later
+        beforeCurrentPage->header.hid = HEADER_MAGIC;
+        beforeCurrentPage->header.padding_amount = 0;
+        
+        // move epilogue to end of this page
+        endOfPage->block_size = 0;
+        endOfPage->fid = EPILOGUE_MAGIC;
+        
+        // add a footer (8 bytes before endOfPage)
+        endOfPageFooter->block_size = beforeCurrentPage->header.block_size;
+        endOfPageFooter->fid = FOOTER_MAGIC;
+        
+        // modify the freelist, using header of page 
+        if(*freelist_head == NULL)
+        {
+            beforeCurrentPage->next = NULL;
+            beforeCurrentPage->prev = NULL;
+            *freelist_head = beforeCurrentPage; // points to the header
+        }
+        else
+        {
+            beforeCurrentPage->next = *freelist_head;
+            beforeCurrentPage->prev = NULL;
+            (*freelist_head)->prev = beforeCurrentPage;
+            *freelist_head = beforeCurrentPage; // points to the header
+        }
+        return 0;
     }
 
     /*
