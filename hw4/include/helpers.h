@@ -27,6 +27,6 @@ int pagesNeeded(size_t size, int* numOfPages, void** currentPage, ics_free_heade
 */
 int removeFromList(ics_free_header* currentListBlock, ics_free_header** freelist_head);
 
-void* loopThroughList(ics_free_header* currentListBlock, size_t calcPadding, size_t mallocBlockSize);
+void* loopThroughList(ics_free_header* currentListBlock, size_t calcPadding, size_t mallocBlockSize, size_t size);
 
 #endif

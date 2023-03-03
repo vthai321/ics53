@@ -32,8 +32,8 @@ void *ics_malloc(size_t size)
 {
     if(size < 0 || size > 24576)
     {
+        errno = EINVAL;
         return NULL;
-        errno = ENOMEM;
     }
     // void* pointer to return allocated space
     void* mallocBlock = NULL;
@@ -52,42 +52,42 @@ void *ics_malloc(size_t size)
         else
         {
             mallocBlockSize = size + 16;  
+            calcPadding = 0;
         }
     }
     else
     {
         mallocBlockSize = 32;
-        calcPadding = 16 - size;
+        calcPadding = 16 - size; // should be 16 - size, right?
     }
     
+    //printf("MALLOCBLOCKSIZE: %d\n"mallocBlockSize);
     if(numOfPages == 0)
     {
         pagesNeeded(size, &numOfPages, &currentPage, &freelist_head, &bottomOfHeap, mallocBlockSize);
     }
     ics_free_header* currentListBlock = freelist_head;
     //debug
-    printf("DEBUG STATEMENT1 BELOW\n");
-    ics_freelist_print();
+    //printf("DEBUG STATEMENT1 BELOW\n");
+    //ics_freelist_print();
     
-    mallocBlock = loopThroughList(currentListBlock, calcPadding, mallocBlockSize);
+    mallocBlock = loopThroughList(currentListBlock, calcPadding, mallocBlockSize, size);
     int pagesNeededResult = 0;
     
     while(mallocBlock == NULL)
     {
-        printf("DEBUG STATEMENT2 BELOW\n");
-        ics_freelist_print();
+        //printf("DEBUG STATEMENT2 BELOW\n");
+        //ics_freelist_print();
         pagesNeededResult = pagesNeeded(size, &numOfPages, &currentPage, &freelist_head, &bottomOfHeap, mallocBlockSize);
         if(pagesNeededResult == -1)
         {
             return NULL;
-            // set errno
+            // errno has been set
         }
         currentListBlock = freelist_head;   
-        mallocBlock = loopThroughList(currentListBlock, calcPadding, mallocBlockSize);
+        mallocBlock = loopThroughList(currentListBlock, calcPadding, mallocBlockSize, size);
     }
-    
     return mallocBlock;
-    // to do: set errno to ENOMEM? 
 }
 
 /*
@@ -102,7 +102,7 @@ void *ics_malloc(size_t size)
  */
 int ics_free(void *ptr) 
 { 
-    void* headerOfBlockAddress = ptr - 8;
+    void* headerOfBlockAddress = ptr - 8; // be careful here
     ics_header* headerOfBlock = (ics_header*)headerOfBlockAddress;
     size_t headerSize = headerOfBlock->block_size;
     
@@ -152,7 +152,7 @@ int ics_free(void *ptr)
     void* nextBlockFooterAddress = nextBlockHeaderAddress + (nextBlockSize - 8);
     ics_footer* nextBlockFooter = (ics_footer*)nextBlockFooterAddress;
 
-    if(nextBlockSize % 2 == 0)
+    if(nextBlockSize % 2 == 0 && nextBlockSize != 0) // cannot coalesce with epilogue, so check that block size != 0...
     {
         //coalesce
         removeFromList(nextBlockHeader, &freelist_head);
