@@ -152,15 +152,41 @@ int ics_free(void *ptr)
     void* nextBlockFooterAddress = nextBlockHeaderAddress + (nextBlockSize - 8);
     ics_footer* nextBlockFooter = (ics_footer*)nextBlockFooterAddress;
 
-    if(nextBlockSize % 2 == 0 && nextBlockSize != 0) // cannot coalesce with epilogue, so check that block size != 0...
+    void* prevBlockFooterAddress = headerOfBlockAddress - 8;
+    ics_footer* prevBlockFooter = (ics_footer*)prevBlockFooterAddress;
+    int prevBlockSize = prevBlockFooter->block_size;
+
+    void* prevBlockHeaderAddress = prevBlockFooterAddress - (prevBlockSize - 8);
+    ics_free_header* prevBlockHeader = (ics_free_header*)prevBlockHeaderAddress; 
+
+    if(nextBlockSize % 2 == 0 && prevBlockSize % 2 == 0 && nextBlockSize != 0 && prevBlockSize != 0)
     {
-        //coalesce
+        //coalesce case 4
+        //must remove 2 blocks this time
+        removeFromList(nextBlockHeader, &freelist_head);
+        removeFromList(prevBlockHeader, &freelist_head);
+        size_t newBlockSize = nextBlockSize + prevBlockSize + headerOfBlock->block_size;
+        // update the header of the prev block and the footer of the next block
+        prevBlockHeader->header.block_size = newBlockSize;
+        nextBlockFooter->block_size = newBlockSize;
+    }
+    else if(nextBlockSize % 2 == 0 && nextBlockSize != 0) // cannot coalesce with epilogue, so check that block size != 0...
+    {
+        //coalesce case 2
         removeFromList(nextBlockHeader, &freelist_head);
         size_t newBlockSize = nextBlockSize + headerOfBlock->block_size;
         // update the header of the block freed by free() and the existing footer of next block
         headerOfBlock->block_size = newBlockSize;
         nextBlockFooter->block_size = newBlockSize;
         // can ignore the middle parts
+    }
+    else if(prevBlockSize % 2 == 0 && prevBlockSize != 0)
+    {
+        //coalesce case 3
+        removeFromList(prevBlockHeader, &freelist_head);
+        size_t newBlockSize = nextBlockSize + headerOfBlock->block_size;
+        headerOfBlock->block_size = newBlockSize;
+        nextBlockFooter->block_size = newBlockSize;
     }
 
     //insert it back into the free list
