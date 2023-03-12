@@ -261,7 +261,7 @@ void ProcessModFile(FILE* fp, list_t* list, char ordering)
 
         theDels = myStrCpy(current, "\t\0");
         current += myStrSize(theDels);
-        theFilename = myStrCpy(current, "\n\0"); // do we include the \n or not
+        theFilename = myStrCpy(current, "\n\0"); // do we include the \n or not; do we include EOF or not
 
         int insertNum = atoi(theInserts);
         int deleteNum = atoi(theDels);

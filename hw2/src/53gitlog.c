@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
                 break;
             case 'a':
                 a_flag = 1;
-            case 'd':
+            case 'd': // change?
 				ORDER_arg = option;
                 break;
             case 'O':
@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
     // getopts only stored the arguments and performed basic checks. More error checking is still needed!!!!
     // tar -C ~/ics53 -cvf hw2_vqthai.tar hw2
 
-    if(A_flag + D_flag > 1)
+    if(A_flag == 1 && D_flag == 1)
     {
         // cannot have more than 1 required option;
         fprintf(stderr, USAGE_MSG);
@@ -81,8 +81,12 @@ int main(int argc, char* argv[]) {
     // dd/mm/yyyy
     // check the date
     // only if D_flag specified
-    time_t gitDate; // on standby 
     
+
+    // use it for the part below where we have to insert into a list
+    // the code below converts the date given in dd/mm/yyyy into unix time (which is present in logs)
+
+    time_t gitDate; // on standby 
     if(D_flag)
     {
         char* dateCharPointer = DATE_arg;
@@ -120,12 +124,16 @@ int main(int argc, char* argv[]) {
             return EXIT_FAILURE;
         }
 
-        int convertYear = year - 1900;
-
         struct tm myTime;
-        myTime.tm_year = convertYear;
-        myTime.tm_mon = month;
+        time_t timeOfDay;
+
+        myTime.tm_year = year - 1900;
+        myTime.tm_mon = month; // month index starts at 0
         myTime.tm_mday = day;
+        myTime.tm_hour = 23;
+        myTime.tm_min = 59;
+        myTime.tm_sec = 59;
+        myTime.tm_isdst = -1; //-1 means we don't know if DST is on
         gitDate = mktime(&myTime);
 
     }
@@ -147,34 +155,41 @@ int main(int argc, char* argv[]) {
 
     if(O_flag)
     {
-        if(fopen(OUTFILE, "w") == NULL)
+        // print into outfile instead of stdout
+        FILE* fd = fopen(OUTFILE, "w");
+        if(fd == NULL) 
         {
             return 2;
+        }
+        else
+        {
+            stdout = fd;
         }
     }
 
     // build the linkedLists
     
-    list_t* modFileList = CreateList(ModFileABC_Comparator, ModFile_Printer, ModFile_Deleter); // 
-    list_t* authorList =  CreateList(ModFileABC_Comparator, ModFile_Printer, ModFile_Deleter); // 
+    list_t* modFileList = CreateList(ModFileABC_Comparator, ModFile_Printer, ModFile_Deleter);  
+    list_t* authorList =  CreateList(ModFileABC_Comparator, ModFile_Printer, ModFile_Deleter);  
 
     // we will read both author and modFile
     FILE* fp = NULL;
     if(I_flag)
     {
         fp = fopen(INFILE, "r");
+        stdin = fp;
     }
     else
     {
         fp = stdin;
     }
     
-    if(D_flag || A_flag)
+    if(A_flag) // changed from: if(A_flag || D_flag)
     {
-        // might need author
-        char* buffer = malloc(200);
-        long int* timeStampBuffer = malloc(sizeof(long int));
-        while(fgets(buffer, 200, fp) != NULL) // putting it here will get all the author lines
+        /*
+        char* buffer = malloc(205);
+        long int* timeStampBuffer = malloc(sizeof(long int)); // will most likely replace with time-getting function
+        while(fgets(buffer, 205, fp) != NULL) // putting it here will get all the author lines
         {  
             Author* newAuthor = CreateAuthor(buffer, timeStampBuffer);
             if(*timeStampBuffer > gitDate)
@@ -187,44 +202,42 @@ int main(int argc, char* argv[]) {
                 InsertInOrder(authorList, newAuthor);
             }
         }
-        free(buffer);
-        buffer = NULL;
-        free(timeStampBuffer);
-         timeStampBuffer = NULL;
+        */
     }
+    else if(D_flag)
+    {
+        // involves modFileList
+        // plan: go through buffer and call processModFile for every line grabbed. compare with date (will have to use converter function)
+        // how to get to the line's date? Use a while loop to get to first space, then increment ONCE after loop
+
+    }
+    free(buffer);
+    buffer = NULL;
+    free(timeStampBuffer);
+    timeStampBuffer = NULL;
 
     // print here
-    if(n_flag)
+    if(D_flag)
     {
-
-    }
-    else
-    {
-        if(O_flag)
+        if(n_flag)
         {
-            if(D_flag)
-            {
-                FILE* outfp = fopen(OUTFILE, "w");
-                PrintLinkedList(modFileList, outfp);
-            }
-            else if(A_flag)
-            {
-
-            }
+            PrintNLinkedList(modFileList, stdout, NUM_arg);
         }
         else
         {
-            if(D_flag)
-            {
-                PrintLinkedList(modFileList, stdout);
-            }
-            else if(A_flag)
-            {
-                if(LEVEL_arg == 0)
-                {
-                    PrintLinkedList(authorList, stdout);
-                }
-            }
+            PrintLinkedList(modFileList, stdout);
+        }
+    }
+    else if(A_flag)
+    {
+        // don't forget to implement levels
+        if(n_flag)
+        {
+            PrintNLinkedList(authorList, stdout, NUM_arg);
+        }
+        else
+        {
+            PrintLinkedList(authorList, stdout);   
         }
     }
 
