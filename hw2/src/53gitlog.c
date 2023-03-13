@@ -43,9 +43,9 @@ int main(int argc, char* argv[]) {
                 break;
             case 'a':
                 a_flag = 1;
-            case 'd': // change?
-				ORDER_arg = option;
-                break;
+            // case 'd': // change?
+			// 	ORDER_arg = option;
+            //     break;
             case 'O':
 				O_flag = 1;
                 OUTFILE = optarg;
@@ -75,6 +75,11 @@ int main(int argc, char* argv[]) {
     {
         // cannot have more than 1 required option;
         fprintf(stderr, USAGE_MSG);
+        return EXIT_FAILURE;
+    }
+
+    if(NUM_arg < 0)
+    {
         return EXIT_FAILURE;
     }
 
@@ -128,7 +133,7 @@ int main(int argc, char* argv[]) {
         time_t timeOfDay;
 
         myTime.tm_year = year - 1900;
-        myTime.tm_mon = month; // month index starts at 0
+        myTime.tm_mon = month - 1; // month index starts at 0
         myTime.tm_mday = day;
         myTime.tm_hour = 23;
         myTime.tm_min = 59;
@@ -184,6 +189,7 @@ int main(int argc, char* argv[]) {
         fp = stdin;
     }
     
+    /*
     if(A_flag) // changed from: if(A_flag || D_flag)
     {
         /*
@@ -202,19 +208,62 @@ int main(int argc, char* argv[]) {
                 InsertInOrder(authorList, newAuthor);
             }
         }
-        */
+    }
+    */
+
+    if(A_flag)
+    {
+        //todo: fix "Syscall param openat(filename) points to unaddressable byte(s)", which is an error outisde the D or A Flags
     }
     else if(D_flag)
     {
         // involves modFileList
         // plan: go through buffer and call processModFile for every line grabbed. compare with date (will have to use converter function)
-        // how to get to the line's date? Use a while loop to get to first space, then increment ONCE after loop
+        // how to get to the line's date? Use a while loop to get to first comma, then increment ONCE after loop
+        // listed in order of appearance by default, otherwise alphabetical order with -a 
+        char* buffer = malloc(205);
+        if(a_flag)
+        {
+            while(fgets(buffer, 200, fp) != NULL)
+            {
+                char* bufferCurrent = buffer;
+                while(*bufferCurrent != ',')
+                {
+                    ++bufferCurrent;
+                }
+                ++bufferCurrent;
 
+                char* modFileDateStr = myStrCpy(bufferCurrent, ",");
+                time_t modFileDate = (time_t) atoll(modFileDateStr);
+                if(modFileDate > gitDate)
+                {
+                    ProcessModFile(fp, modFileList, 'a');
+                }
+                free(modFileDateStr);
+            }
+        }
+        else 
+        {
+            while(fgets(buffer, 200, fp) != NULL) 
+            {
+                char* bufferCurrent = buffer;
+                while(*bufferCurrent != ',')
+                {
+                    ++bufferCurrent;
+                }
+                ++bufferCurrent;
+
+                char* modFileDateStr = myStrCpy(bufferCurrent, ",");
+                time_t modFileDate = (time_t) atoll(modFileDateStr);
+                if(modFileDate > gitDate)
+                {
+                    ProcessModFile(fp, modFileList, 'f');
+                }
+                free(modFileDateStr);
+            }
+        }
+        free(buffer);
     }
-    free(buffer);
-    buffer = NULL;
-    free(timeStampBuffer);
-    timeStampBuffer = NULL;
 
     // print here
     if(D_flag)
